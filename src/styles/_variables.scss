@@ -1,0 +1,54 @@
+$--button-color: #8147e6;
+$--dark-color: #1c1c1c;
+
+@font-face {
+  font-family: semi-bold-italic;
+  src: url(./Fonts/Titillium_Web/TitilliumWeb-SemiBoldItalic.ttf);
+}
+
+@font-face {
+  font-family: extra-light;
+  src: url(./Fonts/Titillium_Web/TitilliumWeb-ExtraLight.ttf);
+}
+
+@font-face {
+  font-family: regular;
+  src: url(./Fonts/Titillium_Web/TitilliumWeb-Regular.ttf);
+}
+
+@font-face {
+  font-family: font-bold;
+  src: url(Fonts/Titillium_Web/TitilliumWeb-Bold.ttf);
+}
+
+@font-face {
+  font-family: semi-bold;
+  src: url(Fonts/Titillium_Web/TitilliumWeb-SemiBold.ttf);
+}
+
+@font-face {
+  font-family: georgian-regular;
+  src: url(Fonts/Noto_Sans_Georgian/static/NotoSansGeorgian-Regular.ttf);
+}
+
+@font-face {
+  font-family: georgian-bold;
+  src: url(Fonts/Noto_Sans_Georgian/static/NotoSansGeorgian-Bold.ttf);
+}
+
+%buttons {
+  cursor: pointer;
+  background: linear-gradient(to bottom, #8181ee, #8147e6);
+  font-family: 'bpg arial caps';
+  padding: 10px;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  box-shadow: 0px 5px 3px #261543;
+  transform: skewX(-5deg);
+
+  &:active {
+    transform: translateY(3px) skewX(-5deg);
+    box-shadow: 0px 2px 3px #261543;
+  }
+}

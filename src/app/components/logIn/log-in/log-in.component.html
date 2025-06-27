@@ -1,0 +1,171 @@
+<main>
+  <div class="text-container">
+    <h2>იშოპინგე მარტივად! შემოგვიერთდი!</h2>
+    <button (click)="openLogIn()">დაიწყე შოპინგი</button>
+  </div>
+  <div class="slider-container">
+    <div class="slider left">
+      <div class="slider-track">
+        <img src="assets/Images/airpods.webp" alt="slider image" />
+        <img src="assets/Images/camera.png" alt="slider image" />
+        <img src="assets/Images/iphone.png" alt="slider image" />
+        <img src="assets/Images/mackbook.png" alt="slider image" />
+        <img src="assets/Images/ps5.webp" alt="slider image" />
+        <img src="assets/Images/smart watch.png" alt="slider image" />
+
+        <img src="assets/Images/airpods.webp" alt="slider image" />
+        <img src="assets/Images/camera.png" alt="slider image" />
+        <img src="assets/Images/iphone.png" alt="slider image" />
+        <img src="assets/Images/mackbook.png" alt="slider image" />
+        <img src="assets/Images/ps5.webp" alt="slider image" />
+        <img src="assets/Images/smart watch.png" alt="slider image" />
+      </div>
+    </div>
+
+    <div class="slider right">
+      <div class="slider-track">
+        <img src="assets/Images/smart watch.png" alt="slider image" />
+        <img src="assets/Images/ps5.webp" alt="slider image" />
+        <img src="assets/Images/mackbook.png" alt="slider image" />
+        <img src="assets/Images/iphone.png" alt="slider image" />
+        <img src="assets/Images/camera.png" alt="slider image" />
+        <img src="assets/Images/airpods.webp" alt="slider image" />
+
+        <img src="assets/Images/smart watch.png" alt="slider image" />
+        <img src="assets/Images/ps5.webp" alt="slider image" />
+        <img src="assets/Images/mackbook.png" alt="slider image" />
+        <img src="assets/Images/iphone.png" alt="slider image" />
+        <img src="assets/Images/camera.png" alt="slider image" />
+        <img src="assets/Images/airpods.webp" alt="slider image" />
+      </div>
+    </div>
+  </div>
+
+  @if(logInActive){
+  <div class="form-wrapper">
+    <div class="logIn-registrate">
+      @if(operation!=="password"){
+      <p (click)="closeLogIn()">&times;</p>
+      }@else {
+      <p (click)="showLogIn()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 448 512"
+          width="20"
+          height="20"
+        >
+          <path
+            d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"
+          />
+        </svg>
+      </p>
+      }
+
+      <div class="main">
+        @if(operation !== "password" && sentPassword === false){
+        <h2>გაიარე ავტორიზაცია</h2>
+        <div class="operation-btns">
+          <div
+            class="operation-btn"
+            [ngClass]="{ active: operation === 'login' }"
+            (click)="showLogIn()"
+          >
+            <p>ავტორიზაცია</p>
+          </div>
+          <div
+            class="operation-btn"
+            [ngClass]="{ active: operation === 'registration' }"
+            (click)="showRegistration()"
+          >
+            <p>რეგისტრაცია</p>
+          </div>
+        </div>
+
+        @if(operation === 'login'){
+        <form [formGroup]="signInInfo" (ngSubmit)="signIn()">
+          <input
+            type="email"
+            placeholder="Email"
+            name="email"
+            formControlName="email"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            name="password"
+            formControlName="password"
+          />
+          <p (click)="showResetPassword()">დაგავიწყდა პაროლი?</p>
+          <button type="submit">შესვლა</button>
+        </form>
+        } @else if (operation === 'registration'){
+        <form [formGroup]="signUpInfo" (ngSubmit)="signUp()">
+          <input
+            type="text"
+            placeholder="Full Name"
+            name="fullName"
+            #fullNameInput
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            name="email"
+            formControlName="email"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            name="password"
+            formControlName="password"
+          />
+          <input
+            type="text"
+            placeholder="Address"
+            name="address"
+            formControlName="address"
+          />
+          <input
+            type="tel"
+            placeholder="Phone"
+            name="phone"
+            formControlName="phone"
+          />
+          <button type="submit" (click)="prepareName(fullNameInput.value)">
+            რეგისტრაცია
+          </button>
+        </form>
+        } } @else if (operation === 'password'){
+        <form
+          [formGroup]="recovery"
+          (ngSubmit)="recoverPassword()"
+          class="password"
+        >
+          <div class="info">
+            <img src="assets/Images/email.webp" alt="Email" />
+
+            @if(!sentRecovery){
+            <p>
+              პაროლის აღსადენად შეიყვანეთ რეგისტრირებული მეილი. მეილზე მოგივათ
+              ლინკი სადაც შეძლებთ პაროლის აღდგენას. თუ ლინკი ვერ ნახეთ შეამოწმეთ
+              SPAM საქაღალდე.
+            </p>
+            }@else{
+            <p>
+              პაროლის აღსადენად ლინკი გამოგზავნილია თქვენს მიერ მითითებულ
+              ფოსტაზე. თუ ლინკი ვერ ნახეთ შეამოწმეთ SPAM საქაღალდე ან იმეილი.
+            </p>
+            }
+          </div>
+
+          <input type="email" placeholder="Email" formControlName="email" />
+          <button type="submit" [disabled]="sentRecovery">
+            @if (sentRecovery) { დარჩა {{ countdown }} წმ } @else { კოდის მიღება
+            }
+          </button>
+        </form>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</main>

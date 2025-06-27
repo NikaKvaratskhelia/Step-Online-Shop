@@ -1,0 +1,12 @@
+@import 'variables';
+
+footer{
+    background-color: $--dark-color;
+    color: #ffffff;
+    padding: 20px 20px 10px;
+
+    p{
+        font-size: 20px;
+        font-family: extra-light;
+    }
+}

@@ -1,0 +1,312 @@
+@import "variables";
+
+@keyframes scrollUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes scrollDown {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scrollRight {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes popUp {
+  0% {
+    transform: translateY(300px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.slider.left .slider-track {
+  animation-name: scrollUp;
+  animation-direction: normal;
+}
+
+.slider.right .slider-track {
+  animation-name: scrollDown;
+  animation-direction: reverse;
+}
+
+main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .text-container {
+    max-width: 50vw;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px 20px 20px 120px;
+
+    h2 {
+      max-width: 600px;
+      margin: auto;
+      font-size: 35px;
+      font-family: georgian-regular;
+    }
+
+    button {
+      @extend %buttons;
+      font-family: "bpg arial caps";
+      font-weight: 500;
+      max-width: 300px;
+      width: 90%;
+      font-size: 23px;
+    }
+  }
+
+  .slider-container {
+    max-width: 50%;
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+
+    .slider {
+      width: 250px;
+      height: 625px;
+      overflow: hidden;
+      position: relative;
+
+      .slider-track {
+        display: flex;
+        flex-direction: column;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-duration: 30s;
+      }
+
+      &.left .slider-track {
+        animation-name: scrollUp;
+      }
+
+      &.right .slider-track {
+        animation-name: scrollDown;
+      }
+
+      img {
+        width: 200px;
+        height: 250px;
+        padding: 10px;
+        margin: 15px auto;
+        border-radius: 10px;
+        background: black;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .form-wrapper {
+    position: fixed;
+    inset: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.307);
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .logIn-registrate {
+      max-width: 350px;
+      width: 100%;
+      position: relative;
+      background-color: white;
+      padding: 20px 20px 40px 20px;
+      border-radius: 8px;
+      animation: popUp 1s;
+      animation-timing-function: ease-in-out;
+
+      > p {
+        font-size: 30px;
+        font-weight: 600;
+        position: absolute;
+        top: 5px;
+        cursor: pointer;
+        left: 10px;
+      }
+
+      .main {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 0px 20px;
+
+        h2 {
+          font-family: "BPG Arial Caps";
+          font-weight: 400;
+        }
+
+        .operation-btns {
+          display: flex;
+          gap: 20px;
+          align-items: center;
+          justify-content: center;
+
+          .operation-btn {
+            border-bottom: 1px solid black;
+            padding: 5px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.5s;
+            p {
+              font-family: "BPG Arial Caps";
+            }
+
+            &.active {
+              opacity: 1;
+              font-weight: 500;
+            }
+          }
+        }
+
+        form {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          align-items: start;
+          justify-content: center;
+
+          &.password {
+            justify-content: end;
+          }
+
+          .info {
+            padding-top: 10px;
+            max-width: 250px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            img{
+              width: 50px;
+            }
+            p{
+              font-size: 12px;
+              font-weight: 400;
+              font-family: 'bpg arial caps';
+            }
+          }
+
+          .name-inputs {
+            display: flex;
+            gap: 10px;
+          }
+          input,
+          button {
+            width: 100%;
+          }
+
+          input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid rgb(198, 195, 195);
+          }
+
+          p {
+            font-family: "bpg arial caps";
+            font-size: 10px;
+            cursor: pointer;
+          }
+
+          button {
+            @extend %buttons;
+            transform: skew(0deg);
+            font-family: "bpg arial caps";
+            font-size: 16px;
+
+            &:active{
+              transform: skew(0deg) translateY(3px);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 940px) {
+  main {
+    flex-direction: column;
+    align-items: start;
+    gap: 20px;
+
+    .text-container {
+      padding: 100px 20px;
+      max-width: unset;
+
+      h2 {
+        text-align: start;
+        margin: unset;
+        max-width: 400px;
+        font-size: 30px;
+      }
+    }
+
+    .slider-container {
+      min-width: 100% !important;
+      flex-direction: column;
+      gap: 20px;
+
+      .slider {
+        width: 100%;
+        height: fit-content;
+        overflow: hidden;
+        position: relative;
+
+        .slider-track {
+          display: flex;
+          flex-direction: row;
+          gap: 20px;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          animation-duration: 10s;
+        }
+
+        &.left .slider-track {
+          animation-name: scrollRight;
+          animation-direction: normal;
+        }
+
+        &.right .slider-track {
+          animation-name: scrollLeft;
+          animation-direction: reverse;
+        }
+      }
+    }
+  }
+}
