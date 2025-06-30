@@ -1,0 +1,163 @@
+import { Component, NgModule, OnInit, ViewChild } from '@angular/core';
+import { ToolsService } from '../../tools.service';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { NgModel } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { HttpHeaders } from '@angular/common/http';
+import { PopUpComponent } from '../pop-up/pop-up.component';
+
+@Component({
+  selector: 'app-details',
+  imports: [CommonModule, RouterModule, PopUpComponent],
+  templateUrl: './details.component.html',
+  styleUrl: './details.component.scss',
+})
+export class DetailsComponent implements OnInit {
+  id: string | null = '';
+  public selectedProduct: any;
+  public index: number = 0;
+  averageRating = 0;
+  starsDisplay: ('full' | 'half' | 'empty')[] = [];
+  public userHasCart: boolean = false;
+  public productExsistsInCart: boolean = false;
+  public productInCart: any;
+  public updating: boolean = false;
+
+  public headers = new HttpHeaders({
+    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+  });
+
+  @ViewChild(PopUpComponent) popUp!: PopUpComponent;
+
+  constructor(private tools: ToolsService, private route: ActivatedRoute) {
+    this.id = this.route.snapshot.paramMap.get('id');
+    this.refreshCart();
+  }
+
+  refreshCart() {
+    this.tools.getCart().subscribe((data: any) => {
+      data.status === 200
+        ? (this.userHasCart = true)
+        : (this.userHasCart = false);
+
+      data.body.products.forEach((product: any) => {
+        if (product.productId === this.id) {
+          this.productExsistsInCart = true;
+          this.productInCart = product;
+          console.log('Product exists in cart:', this.productInCart);
+        }
+      });
+    });
+  }
+
+  ngOnInit(): void {
+    this.openProductDetails();
+  }
+
+  prev() {
+    if (this.index !== 0) {
+      this.index--;
+    }
+  }
+
+  next(list: any) {
+    console.log(this.userHasCart);
+    if (this.index === list.length - 1) {
+      return;
+    } else {
+      this.index++;
+    }
+  }
+
+  openProductDetails() {
+    console.log('Opening product details for ID:', this.id);
+    this.tools.getProductId(this.id).subscribe((data: any) => {
+      this.selectedProduct = data;
+      if (data.ratings.length > 0) {
+        const total = data.ratings.reduce(
+          (sum: number, r: any) => sum + r.value,
+          0
+        );
+        this.averageRating = total / data.ratings.length;
+      } else {
+        this.averageRating = 0;
+      }
+      this.updateStarsDisplay();
+    });
+  }
+
+  updateStarsDisplay() {
+    this.starsDisplay = [];
+    const fullStars = Math.floor(this.averageRating);
+    const hasHalfStar =
+      this.averageRating - fullStars >= 0.25 &&
+      this.averageRating - fullStars < 0.75;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        this.starsDisplay.push('full');
+      } else if (i === fullStars && hasHalfStar) {
+        this.starsDisplay.push('half');
+      } else {
+        this.starsDisplay.push('empty');
+      }
+    }
+  }
+
+  addToCart() {
+    this.updating = true;
+    if (this.userHasCart) {
+      this.refreshCart();
+    }
+    setTimeout(() => {
+      this.userHasCart
+        ? this.productExsistsInCart
+          ? this.tools
+              .addToCart(
+                { id: this.id, quantity: this.productInCart.quantity + 1 },
+                this.headers
+              )
+              .subscribe((data: any) => {
+                console.log('quantity');
+                if (data && data.products) {
+                  this.popUp.show(
+                    'Product added to cart successfully!',
+                    'green'
+                  );
+                } else {
+                  this.popUp.show('Failed to add product to cart.', 'red');
+                }
+                this.refreshCart();
+              })
+          : this.tools
+              .addToCart({ id: this.id, quantity: 1 }, this.headers)
+              .subscribe((data: any) => {
+                console.log('new product');
+                if (data && data.products) {
+                  this.popUp.show(
+                    'Product added to cart successfully!',
+                    'green'
+                  );
+                } else {
+                  this.popUp.show('Failed to add product to cart.', 'red');
+                }
+                this.refreshCart();
+              })
+        : this.tools
+            .addCreateToCart({ id: this.id, quantity: 1 }, this.headers)
+            .subscribe((data: any) => {
+              if (data && data.products) {
+                this.popUp.show('Product added to cart successfully!', 'green');
+                this.userHasCart = true;
+                console.log(this.id);
+              } else {
+                this.popUp.show('Failed to add product to cart.', 'red');
+              }
+
+              this.refreshCart();
+            });
+
+      this.updating = false;
+    }, 1000);
+  }
+}

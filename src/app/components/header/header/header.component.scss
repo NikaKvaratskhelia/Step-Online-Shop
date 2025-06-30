@@ -19,6 +19,9 @@ header {
 
   h1 {
     font-family: semi-bold-italic;
+    cursor: pointer;
+    user-select: none;
+    color: #000000;
   }
 
   .LogIn {

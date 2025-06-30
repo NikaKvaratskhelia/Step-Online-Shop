@@ -1,40 +1,48 @@
 @if(isLoading){
-  <div class="cart-loading">
-    <p>Loading your cart...</p>
-  </div>
+<div class="cart-loading">
+  <p>Loading your cart...</p>
+</div>
 } @else if(cartItems.length > 0){
-  <div class="cart-container">
-    <h2>Your Cart</h2>
+<div class="cart-container">
+  <h2>Your Cart</h2>
 
-    <div class="cart-items">
-      @for (item of cartItems; track item.productId) {
-        <div class="cart-item">
-          <img [src]="item.productDetails?.thumbnail" alt="Product" />
+  <div class="cart-items">
+    @for (item of cartItems; track item.productId) {
+    <div class="cart-item">
+      <a [routerLink]="['/details', item.productId]" class="cart-image">
+        <img [src]="item.productDetails?.thumbnail" alt="Product" />
+      </a>
 
-          <div class="cart-info">
-            <h3>{{ item.productDetails?.title }}</h3>
-            <p>{{ item.productDetails?.price.current }}$</p>
+      <div class="cart-info">
+        <h3>{{ item.productDetails?.title }}</h3>
+        <p>{{ item.productDetails?.price.current }}$</p>
 
-            <div class="cart-quantity">
-              <button (click)="decreaseQty(item)">−</button>
-              <span>{{ item.quantity }}</span>
-              <button (click)="increaseQty(item)">+</button>
-            </div>
-          </div>
-
-          <button class="remove" (click)="removeFromCart(item)">×</button>
+        <div class="cart-quantity">
+          <button (click)="decreaseQty(item)">−</button>
+          <span>{{ item.quantity }}</span>
+          <button (click)="increaseQty(item)">+</button>
         </div>
-      }
-    </div>
+      </div>
 
-    <div class="cart-summary">
-      <p>Subtotal: <strong>{{ getTotalPrice() }}$</strong></p>
-      <button class="checkout-btn">Proceed to Checkout</button>
+      <button class="remove" (click)="removeFromCart(item)">×</button>
     </div>
+    }
   </div>
+
+  <div class="cart-summary">
+    <p>
+      Subtotal: <strong>{{ getTotalPrice() }}$</strong>
+    </p>
+    <a class="checkout-btn" [routerLink]="['/checkout']">
+      Proceed to Checkout
+    </a>
+  </div>
+</div>
 } @else {
-  <div class="empty-cart">
-    <h2>Your cart is empty 🛒</h2>
-    <p>Add something nice!</p>
-  </div>
+<div class="empty-cart">
+  <h2>Your cart is empty 🛒</h2>
+  <p>Add something nice!</p>
+</div>
 }
+
+<app-pop-up></app-pop-up>

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 
@@ -6,7 +6,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ToolsService {
-  constructor(private http: HttpClient) {}
+  constructor(public http: HttpClient) {}
 
   // Get all products with pagination
   getProductsAll(page: number): Observable<any> {
@@ -43,7 +43,7 @@ export class ToolsService {
     );
   }
 
-  getProductId(id: string) {
+  getProductId(id: string|null) {
     return this.http.get(
       `https://api.everrest.educata.dev/shop/products/id/${id}`
     );
@@ -84,6 +84,11 @@ export class ToolsService {
       }
     );
   }
+
+  checkout(headers: HttpHeaders) {
+  return this.http.post(`https://api.everrest.educata.dev/shop/cart/checkout`, {}, { headers });
+}
+
 
   // ----------- Authentication & UI state ---------------
 

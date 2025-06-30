@@ -1,0 +1,44 @@
+.pop-up {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  max-width: 300px;
+  width: 100%;
+  transform: translateX(-50%);
+  background-color: #0a74da;
+  color: white;
+  padding: 12px 24px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'bpg arial caps';
+  animation: slideUp 0.3s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
+}
+
+.green{
+    background-color: green;
+}
+
+.red{
+    background-color: red;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}

@@ -1,4 +1,3 @@
-@if(selectedProductId===null){
 <div class="container">
   <div class="filter-products">
     <div class="wrapper">
@@ -57,9 +56,9 @@
             <p>Out Of stock</p>
             }
             <p>Price: {{ product.price.current }}$</p>
-            <button class="card-btn" (click)="openProductDetails(product._id)">
+            <a class="card-btn" [routerLink]="['/details', product._id]">
               View Details
-            </button>
+            </a>
           </div>
         </div>
         }@empty {
@@ -80,80 +79,3 @@
     }
   </div>
 </div>
-} @else{
-
-<div class="product-detail">
-  <button class="back-btn" (click)="closeDetail()">← Back</button>
-  <div class="image-section">
-    <div class="slider-btn" (click)="prev()">&#10094;</div>
-    <img [src]="selectedProduct.images[index]" alt="Product image" />
-    <div class="slider-btn" (click)="next(selectedProduct.images)">
-      &#10095;
-    </div>
-  </div>
-
-  <div class="info-section">
-    <h1 class="product-title">{{ selectedProduct.title }}</h1>
-    <p class="product-description">{{ selectedProduct.description }}</p>
-
-    <div class="price-box">
-      <span class="price">{{
-        selectedProduct.price.current
-          | currency : selectedProduct.price.currency
-      }}</span>
-
-      @if(selectedProduct.price.discountPercentage !== 0){
-      <span class="before">{{
-        selectedProduct.price.beforeDiscount
-          | currency : selectedProduct.price.currency
-      }}</span>
-      <span class="discount"
-        >-{{ selectedProduct.price.discountPercentage }}%</span
-      >
-      }
-    </div>
-
-    @if(averageRating > 0){
-    <div class="stars">
-      @for(star of starsDisplay; track $index){
-      <ng-container>
-        <span
-          class="star"
-          [ngClass]="{
-            filled: star === 'full',
-            half: star === 'half'
-          }"
-          >&#9733;</span
-        >
-      </ng-container>
-      }
-      <span class="average-number">({{ averageRating.toFixed(1) }})</span>
-    </div>
-    }
-
-    <div class="features">
-      <div><strong>Brand:</strong> {{ selectedProduct.brand }}</div>
-      <div>
-        <strong>Warranty:</strong> {{ selectedProduct.warranty }} year(s)
-      </div>
-      <div>
-        <strong>Stock:</strong>
-        {{ selectedProduct.stock > 0 ? selectedProduct.stock : "Out of stock" }}
-      </div>
-      <div><strong>Category:</strong> {{ selectedProduct.category.name }}</div>
-      <div>
-        <strong>Release:</strong> {{ selectedProduct.issueDate | date }}
-      </div>
-    </div>
-
-    <button
-      class="add-to-cart-btn"
-      [disabled]="selectedProduct.stock === 0"
-      (click)="userHasCart ? addToCart(selectedProduct._id) : addCreateToCart(selectedProduct._id)"
-    >
-      {{ selectedProduct.stock === 0 ? "Out of Stock" : "Add to Cart" }}
-    </button>
-  </div>
-</div>
-
-}

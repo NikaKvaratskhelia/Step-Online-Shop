@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToolsService } from '../../tools.service';
 import { HttpHeaders } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
 })
@@ -130,62 +131,6 @@ export class MainComponent {
   closeDetail() {
     this.selectedProductId = null;
     this.selectedProduct = {};
-  }
-
-  averageRating = 0;
-  starsDisplay: ('full' | 'half' | 'empty')[] = [];
-
-  updateStarsDisplay() {
-    this.starsDisplay = [];
-    const fullStars = Math.floor(this.averageRating);
-    const hasHalfStar =
-      this.averageRating - fullStars >= 0.25 &&
-      this.averageRating - fullStars < 0.75;
-
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) {
-        this.starsDisplay.push('full');
-      } else if (i === fullStars && hasHalfStar) {
-        this.starsDisplay.push('half');
-      } else {
-        this.starsDisplay.push('empty');
-      }
-    }
-  }
-
-  openProductDetails(id: string) {
-    console.log(this.userHasCart);
-    this.selectedProductId = id;
-    this.tools.getProductId(id).subscribe((data: any) => {
-      this.selectedProduct = data;
-      this.selectedCategoryID = data.category.id;
-      if (data.ratings.length > 0) {
-        const total = data.ratings.reduce(
-          (sum: number, r: any) => sum + r.value,
-          0
-        );
-        this.averageRating = total / data.ratings.length;
-      } else {
-        this.averageRating = 0;
-      }
-      this.updateStarsDisplay();
-    });
-  }
-
-  public index: number = 0;
-
-  prev() {
-    if (this.index !== 0) {
-      this.index--;
-    }
-  }
-
-  next(list: any) {
-    if (this.index === list.length - 1) {
-      return;
-    } else {
-      this.index++;
-    }
   }
 
   public headers = new HttpHeaders({

@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ToolsService } from '../../tools.service';
 import { HttpHeaders } from '@angular/common/http';
+import { PopUpComponent } from '../pop-up/pop-up.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss'],
+  imports: [PopUpComponent, RouterModule],
 })
 export class CartComponent {
   public cartItems: any[] = [];
@@ -20,12 +23,16 @@ export class CartComponent {
     this.getCart();
   }
 
-  getCart() {
-    this.isLoading = true;
-    this.cartItems = [];
+  @ViewChild(PopUpComponent) popUp!: PopUpComponent;
 
-    this.http.getCart().subscribe((res: any) => {
+  getCart() {
+  this.isLoading = true;
+  this.cartItems = [];
+
+  this.http.getCart().subscribe({
+    next: (res: any) => {
       const products = res.body.products;
+
 
       this.cartItems = products.map((item: any) => ({
         ...item,
@@ -33,9 +40,8 @@ export class CartComponent {
       }));
 
       let loaded = 0;
-
-      if(products.length===0) this.isLoading= false
-
+      if (products.length === 0) this.isLoading = false;
+      
       products.forEach((item: any, index: number) => {
         this.http.getProductId(item.productId).subscribe((productData: any) => {
           this.cartItems[index].productDetails = productData;
@@ -45,8 +51,20 @@ export class CartComponent {
           }
         });
       });
-    });
-  }
+    },
+    error: (err) => {
+      if (err.status === 409 && err.error?.error === 'User has to create cart first') {
+        // Treat "no cart" as "empty cart"
+        this.cartItems = [];
+        this.isLoading = false;
+      } else {
+        console.error('Unexpected cart error:', err);
+        this.popUp.show('Error loading cart', 'red');
+        this.isLoading = false;
+      }
+    },
+  });
+}
 
   increaseQty(item: any) {
     const newQty = item.quantity + 1;
@@ -54,6 +72,7 @@ export class CartComponent {
       .addToCart({ id: item.productId, quantity: newQty }, this.headers)
       .subscribe(() => {
         item.quantity = newQty;
+        this.popUp.show('Quantity increased successfully!', 'green');
       });
   }
 
@@ -64,14 +83,18 @@ export class CartComponent {
         .addToCart({ id: item.productId, quantity: newQty }, this.headers)
         .subscribe(() => {
           item.quantity = newQty;
+          this.popUp.show('Quantity decreased successfully!', 'green');
         });
+    } else {
+      this.removeFromCart(item);
     }
   }
 
   removeFromCart(item: any) {
-    this.http
-      .deleteCartItem(item.productId, this.headers)
-      .subscribe(() => this.getCart());
+    this.http.deleteCartItem(item.productId, this.headers).subscribe(() => {
+      this.getCart();
+      this.popUp.show('Item removed from cart!', 'red');
+    });
   }
 
   getTotalPrice(): number {

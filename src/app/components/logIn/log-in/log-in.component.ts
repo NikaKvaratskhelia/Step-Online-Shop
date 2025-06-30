@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component, NgModule, ViewChild } from '@angular/core';
 import { ToolsService } from '../../../tools.service';
 import {
   FormControl,
@@ -8,10 +8,11 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PopUpComponent } from '../../pop-up/pop-up.component';
 
 @Component({
   selector: 'app-log-in',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PopUpComponent],
   templateUrl: './log-in.component.html',
   styleUrl: './log-in.component.scss',
 })
@@ -23,8 +24,9 @@ export class LogInComponent {
   public countdown: number = 0;
   public countdownInterval: any;
 
-
   constructor(private tools: ToolsService, private router: Router) {}
+
+  @ViewChild(PopUpComponent) popUp!: PopUpComponent;
 
   openLogIn() {
     this.logInActive = true;
@@ -86,32 +88,42 @@ export class LogInComponent {
     this.tools.signIn(this.signInInfo.value).subscribe((data: any) => {
       sessionStorage.setItem('token', data.access_token);
       this.tools.setLoggedIn(true);
-      this.router.navigate(['/home']);
+      this.popUp.show('Welcome back!', 'green');
+
+      setTimeout(() => {
+        this.router.navigate(['/home']);
+      }, 1000);
     });
   }
 
   signUp() {
-    this.tools
-      .signUp(this.signUpInfo.value)
-      .subscribe((data) => console.log(data));
+    this.tools.signUp(this.signUpInfo.value).subscribe((data: any) => {
+      console.log(data);
+      if (data.status === 201) {
+        this.popUp.show('Registration successful! Now please verify your email!', 'green');
+        this.signUpInfo.reset();
+        this.showLogIn();
+      } else {
+        this.popUp.show('Registration failed. Please try again.', 'red');
+      }
+    });
   }
 
   recoverPassword() {
-  this.tools.recoverPassword(this.recovery.value).subscribe((data: any) => {
-    console.log(data)
-    if (data.status === 200) {
-      this.sentRecovery = true;
-      this.countdown = 60; 
+    this.tools.recoverPassword(this.recovery.value).subscribe((data: any) => {
+      console.log(data);
+      if (data.status === 200) {
+        this.sentRecovery = true;
+        this.countdown = 60;
 
-      this.countdownInterval = setInterval(() => {
-        this.countdown--;
-        if (this.countdown === 0) {
-          clearInterval(this.countdownInterval);
-          this.sentRecovery = false;
-        }
-      }, 1000);
-    }
-  });
-}
-
+        this.countdownInterval = setInterval(() => {
+          this.countdown--;
+          if (this.countdown === 0) {
+            clearInterval(this.countdownInterval);
+            this.sentRecovery = false;
+          }
+        }, 1000);
+      }
+    });
+  }
 }

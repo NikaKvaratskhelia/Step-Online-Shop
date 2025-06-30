@@ -1,0 +1,34 @@
+<form class="payment-info" (submit)="checkout($event)">
+
+  <div class="card-number">
+    <label for="cardNum"
+      >ბარათის ნომერი*</label
+    >
+    <input type="text" id="cardNum" placeholder="0123 4567 8901 1234"  required/>
+  </div>
+
+  <div class="card-date-cvv">
+    <div class="card-date input-group">
+      <label for="cardDate" 
+        >მოქმედების ვადა*</label
+      >
+      <input type="text" id="cardDate" placeholder="MM / YYYY"  required/>
+    </div>
+
+    <div class="card-cvv input-group">
+      <label for="cardCvv">CVC / CVV</label>
+      <input type="text" id="cardCvv" placeholder="CVC / CVV"  required/>
+    </div>
+  </div>
+
+  <div class="card-owner input-group">
+    <label for="cardOwner"
+      >ბარათის მფლობელი*</label
+    >
+    <input type="text" id="cardOwner" placeholder="J.Smith"  required/>
+  </div>
+
+  <button type="submit">გადახდა</button>
+</form>
+
+<app-pop-up></app-pop-up>

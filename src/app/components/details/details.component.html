@@ -1,0 +1,89 @@
+<div class="product-detail">
+  <a class="back-btn" routerLink="/home"
+    ><img src="assets/Images/arrow.png" alt="" /> Back</a
+  >
+  <div class="image-section">
+    <div class="slider-btn" (click)="prev()">&#10094;</div>
+    <img [src]="selectedProduct.images[index]" alt="Product image" />
+    <div class="slider-btn" (click)="next(selectedProduct.images)">
+      &#10095;
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h1 class="product-title">{{ selectedProduct.title }}</h1>
+    <p class="product-description">{{ selectedProduct.description }}</p>
+
+    <div class="price-box">
+      <span class="price">{{
+        selectedProduct.price.current
+          | currency : selectedProduct.price.currency
+      }}</span>
+
+      @if(selectedProduct.price.discountPercentage !== 0){
+      <span class="before">{{
+        selectedProduct.price.beforeDiscount
+          | currency : selectedProduct.price.currency
+      }}</span>
+      <span class="discount"
+        >-{{ selectedProduct.price.discountPercentage }}%</span
+      >
+      }
+    </div>
+
+    @if(averageRating > 0){
+    <div class="stars">
+      @for(star of starsDisplay; track $index){
+      <ng-container>
+        <span
+          class="star"
+          [ngClass]="{
+            filled: star === 'full',
+            half: star === 'half'
+          }"
+          >&#9733;</span
+        >
+      </ng-container>
+      }
+      <span class="average-number">({{ averageRating.toFixed(1) }})</span>
+    </div>
+    }
+
+    <div class="features">
+      <div>
+        <strong>Brand:</strong>
+        <p>{{ selectedProduct.brand.toUpperCase() }}</p>
+      </div>
+      <div>
+        <strong>Warranty:</strong>
+        <p>{{ selectedProduct.warranty }} year(s)</p>
+      </div>
+      <div>
+        <strong>Stock:</strong>
+        <p>
+          {{
+            selectedProduct.stock >= 0 ? selectedProduct.stock : "Out of stock"
+          }}
+        </p>
+      </div>
+      <div>
+        <strong>Category:</strong>
+        <p>{{ selectedProduct.category.name }}</p>
+      </div>
+      <div>
+        <strong>Release:</strong>
+        <p>{{ selectedProduct.issueDate | date }}</p>
+      </div>
+    </div>
+
+    <button
+      class="add-to-cart-btn"
+      [disabled]="selectedProduct.stock <= 0 || updating"
+      (click)="addToCart()"
+    >
+      {{ selectedProduct.stock <= 0 ? "Out of Stock" : "Add to Cart" }}
+    </button>
+  </div>
+</div>
+
+<app-pop-up></app-pop-up>
