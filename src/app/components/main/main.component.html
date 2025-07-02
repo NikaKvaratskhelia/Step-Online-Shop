@@ -1,35 +1,56 @@
+<form [formGroup]="filterForm" class="filter-form">
+  <input formControlName="keywords" placeholder="Search keywords" />
+  <input formControlName="rating" placeholder="Rating" type="number" />
+  <input formControlName="price_min" placeholder="Min Price" type="number" />
+  <input formControlName="price_max" placeholder="Max Price" type="number" />
+
+  <select formControlName="sort_by">
+    <option value="rating">Rating</option>
+    <option value="price">Price</option>
+    <option value="title">Title</option>
+    <option value="issue_date">Issue Date</option>
+  </select>
+
+  <select formControlName="sort_direction">
+    <option value="asc">Asc</option>
+    <option value="desc">Desc</option>
+  </select>
+</form>
+
 <div class="container">
   <div class="filter-products">
     <div class="wrapper">
       <p (click)="showFilter = !showFilter" class="toggle-filter">
         @if(showFilter){ HIDE }@else {SHOW} FILTER
       </p>
-      <div class="filter-wrapper" [ngClass]="{ active: showFilter === true }">
+
+      <div class="filter-wrapper" [ngClass]="{ active: showFilter }">
         <div>
           <div class="category-filters">
-            @for(item of categories; track $index){
-            <div
-              class="category"
-              (click)="filter(selectedBrand, item.id)"
-              [ngClass]="{ active: selectedCategoryID === item.id }"
-            >
-              <img [src]="item.image" alt="" />
-            </div>
+            @for (item of categories; track $index) {
+              <div
+                class="category"
+                (click)="selectCategory(item.id)"
+                [ngClass]="{ active: filterForm.value.category_id === item.id }"
+              >
+                <img [src]="item.image" alt="" />
+              </div>
             }
           </div>
 
           <div class="brand-filters">
-            @for(item of brands; track $index){
-            <div
-              class="filter-btn"
-              [ngClass]="{ active: selectedBrand === item }"
-              (click)="filter(item, selectedCategoryID)"
-            >
-              <p>{{ item.toUpperCase() }}</p>
-            </div>
+            @for (item of brands; track $index) {
+              <div
+                class="filter-btn"
+                [ngClass]="{ active: filterForm.value.brand === item }"
+                (click)="selectBrand(item)"
+              >
+                <p>{{ item.toUpperCase() }}</p>
+              </div>
             }
           </div>
         </div>
+
         <div class="filter-btn" (click)="resetFilters()">
           <p>Reset Filter</p>
         </div>
@@ -40,29 +61,27 @@
       <h2>Our Products:</h2>
       <section>
         @for (product of allProducts; track $index) {
-        <div class="card">
-          <div class="card-slider">
-            @if(product.price.discountPercentage !== 0){
-            <div class="discount">
-              <p>{{ product.price.discountPercentage }}% OFF</p>
+          <div class="card">
+            <div class="card-slider">
+              @if (product.price.discountPercentage !== 0) {
+                <div class="discount">
+                  <p>{{ product.price.discountPercentage }}% OFF</p>
+                </div>
+              }
+              <img [src]="product.thumbnail" alt="Product Photo" />
             </div>
-            }
-            <img [src]="product.thumbnail" alt="Product Photo" />
-          </div>
 
-          <div class="card-content">
-            <h2 class="card-title">{{ product.title }}</h2>
-            @if(product.stock<=0){
-            <p>Out Of stock</p>
-            }
-            <p>Price: {{ product.price.current }}$</p>
-            <a class="card-btn" [routerLink]="['/details', product._id]">
-              View Details
-            </a>
+            <div class="card-content">
+              <h2 class="card-title">{{ product.title }}</h2>
+              @if(product.stock <= 0) {
+                <p>Out Of Stock</p>
+              }
+              <p>Price: {{ product.price.current }}$</p>
+              <a class="card-btn" [routerLink]="['/details', product._id]">View Details</a>
+            </div>
           </div>
-        </div>
-        }@empty {
-        <h1>No Items Match Your Filter</h1>
+        } @empty {
+          <h1>No Items Match Your Filter</h1>
         }
       </section>
     </div>
@@ -70,12 +89,12 @@
 
   <div class="pagination">
     @for (page of pageList; track $index) {
-    <button
-      [ngClass]="{ active: page === myPageIndex }"
-      (click)="filter(selectedBrand, selectedCategoryID, page)"
-    >
-      {{ page }}
-    </button>
+      <button
+        [ngClass]="{ active: page === myPageIndex }"
+        (click)="changePage(page)"
+      >
+        {{ page }}
+      </button>
     }
   </div>
 </div>

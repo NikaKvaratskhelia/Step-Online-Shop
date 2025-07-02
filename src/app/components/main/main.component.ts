@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ToolsService } from '../../tools.service';
 import { HttpHeaders } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule],
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
 })
@@ -16,54 +17,45 @@ export class MainComponent {
   public pageList: number[] = [];
   public categories: any[] = [];
   public brands: string[] = [];
-  public selectedCategoryID: number | null = null;
-  public selectedBrand: string = '';
   public myPageIndex: number = 1;
   public showFilter: boolean = false;
   public selectedProductId: string | null = null;
   public selectedProduct: any;
-  public userHasCart: boolean = false;
 
-  constructor(private tools: ToolsService) {
-    this.loadInitialData();
-  }
+  public filterForm: FormGroup;
 
-  hasCart() {
-    this.tools.getCart().subscribe({
-      next: (res:any) => {
-        this.userHasCart = res.status === 200;
-        console.log('Cart exists:', this.userHasCart, res.body);
-      },
-      error: (err) => {
-        this.userHasCart = false;
-        console.error('Cart check failed:', err);
-      },
+  public headers = new HttpHeaders({
+    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+  });
+
+  constructor(private tools: ToolsService, private fb: FormBuilder) {
+    this.filterForm = this.fb.group({
+      page_index: [1],
+      page_size: [6],
+      keywords: [''],
+      category_id: [''],
+      brand: [''],
+      rating: [''],
+      price_min: [''],
+      price_max: [''],
+      sort_by: ['rating'],
+      sort_direction: ['desc'],
     });
+
+    this.filterForm.valueChanges.subscribe(() => this.getFilteredProducts());
+
+    this.loadInitialData();
   }
 
   loadInitialData() {
     this.getCategories();
     this.getBrands();
-    this.allProduct(1);
-    this.hasCart();
+    this.getFilteredProducts();
   }
 
-  allProduct(page: number) {
-    this.selectedCategoryID = null;
-    this.selectedBrand = '';
-    this.tools.getProductsAll(page).subscribe((data: any) => {
-      this.allProducts = data.products;
-      this.setupPagination(data.total, data.limit);
-      this.myPageIndex = page;
-    });
-  }
-
-  setupPagination(total: number, limit: number) {
-    const pageNum = Math.ceil(total / limit);
-    this.pageList = [];
-    for (let i = 1; i <= pageNum; i++) {
-      this.pageList.push(i);
-    }
+  changePage(page: number) {
+    this.myPageIndex = page;
+    this.filterForm.patchValue({ page_index: page });
   }
 
   getCategories() {
@@ -76,81 +68,59 @@ export class MainComponent {
     this.tools.getBrands().subscribe((data: any) => (this.brands = data));
   }
 
+  selectCategory(categoryID: number | null) {
+    this.filterForm.patchValue({ category_id: categoryID, page_index: 1 });
+  }
 
-  filter(
-    brand: string = this.selectedBrand,
-    categoryID: number | null = this.selectedCategoryID,
-    page: number = 1
-  ) {
-    this.selectedBrand = brand;
-    this.selectedCategoryID = categoryID;
-    this.myPageIndex = page;
-    console.log(
-      'FILTER - brand:',
-      brand,
-      'category:',
-      categoryID,
-      'page:',
-      page
-    );
-
-    if (categoryID === null && brand !== '') {
-      console.log('filtered by brand');
-      this.tools.getByBrand(brand, page).subscribe((data: any) => {
-        this.allProducts = data.products;
-        this.setupPagination(data.total, data.limit);
-      });
-    } else if (categoryID !== null && brand === '') {
-      console.log('filtered by category');
-      this.tools.getByCategory(categoryID, page).subscribe((data: any) => {
-        this.allProducts = data.products;
-        this.setupPagination(data.total, data.limit);
-      });
-    } else if (brand !== '' && categoryID !== null) {
-      console.log('filtered by both');
-      this.tools.getByBrand(brand, page).subscribe((data: any) => {
-        const filtered = data.products.filter((item: any) => {
-          return item.category?.id === categoryID;
-        });
-
-        this.allProducts = filtered;
-        this.setupPagination(filtered.length, 6);
-      });
-    } else {
-      console.log('all products');
-      this.allProduct(page);
-    }
+  selectBrand(brand: string) {
+    this.filterForm.patchValue({ brand: brand, page_index: 1 });
   }
 
   resetFilters() {
-    this.selectedCategoryID = null;
-    this.selectedBrand = '';
-    this.allProduct(1);
+    this.filterForm.patchValue({
+      keywords: '',
+      category_id: '',
+      brand: '',
+      rating: '',
+      price_min: '',
+      price_max: '',
+      sort_by: 'rating',
+      sort_direction: 'desc',
+      page_index: 1,
+    });
   }
 
-  closeDetail() {
-    this.selectedProductId = null;
-    this.selectedProduct = {};
+  buildUrl(): string {
+    const baseUrl = 'https://api.everrest.educata.dev/shop/products/search';
+    const params: string[] = [];
+    const values = this.filterForm.value;
+
+    for (const key in values) {
+      const val = values[key];
+      if (val !== '' && val !== null && val !== undefined) {
+        params.push(`${key}=${encodeURIComponent(val)}`);
+      }
+    }
+
+    return `${baseUrl}?${params.join('&')}`;
   }
 
-  public headers = new HttpHeaders({
-    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-  });
-
-  addCreateToCart(id: any) {
-    this.tools
-      .addCreateToCart({ id: id, quantity: 1 }, this.headers)
-      .subscribe((data: any) => {
-        console.log(data);
-        this.userHasCart = true;
-      });
+  getFilteredProducts() {
+    const url = this.buildUrl();
+    this.tools.getFilteredProducts(url).subscribe({
+      next: (res: any) => {
+        this.allProducts = res.products || [];
+        this.setupPagination(res.total || 0, res.limit || 6);
+        this.myPageIndex = res.page || 1;
+      },
+      error: (err) => {
+        console.error('Filter request failed:', err);
+      },
+    });
   }
 
-  addToCart(id: any) {
-    this.tools
-      .addToCart({ id: id, quantity: 1 }, this.headers)
-      .subscribe((data: any) => {
-        console.log(data);
-      });
+  setupPagination(total: number, limit: number) {
+    const pageNum = Math.ceil(total / limit);
+    this.pageList = Array.from({ length: pageNum }, (_, i) => i + 1);
   }
 }

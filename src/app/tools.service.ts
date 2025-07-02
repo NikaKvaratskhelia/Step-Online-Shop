@@ -6,7 +6,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ToolsService {
-  constructor(public http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   // Get all products with pagination
   getProductsAll(page: number): Observable<any> {
@@ -43,7 +43,7 @@ export class ToolsService {
     );
   }
 
-  getProductId(id: string|null) {
+  getProductId(id: string | null) {
     return this.http.get(
       `https://api.everrest.educata.dev/shop/products/id/${id}`
     );
@@ -86,9 +86,16 @@ export class ToolsService {
   }
 
   checkout(headers: HttpHeaders) {
-  return this.http.post(`https://api.everrest.educata.dev/shop/cart/checkout`, {}, { headers });
-}
+    return this.http.post(
+      `https://api.everrest.educata.dev/shop/cart/checkout`,
+      {},
+      { headers }
+    );
+  }
 
+  getFilteredProducts(url: string) {
+    return this.http.get(url);
+  }
 
   // ----------- Authentication & UI state ---------------
 
