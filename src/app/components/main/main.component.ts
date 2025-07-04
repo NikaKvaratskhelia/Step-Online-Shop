@@ -45,6 +45,8 @@ export class MainComponent {
     this.filterForm.valueChanges.subscribe(() => this.getFilteredProducts());
 
     this.loadInitialData();
+
+    this.tools.getUser().subscribe((data:any) => {console.log(data), sessionStorage.setItem('user', JSON.stringify(data))});
   }
 
   loadInitialData() {

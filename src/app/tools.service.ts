@@ -146,7 +146,10 @@ export class ToolsService {
 
   getUser() {
     return this.http.get(`https://api.everrest.educata.dev/auth`, {
-      headers: { Authorization: `Bearer: ${sessionStorage.getItem('token')}` },
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+      },
     });
   }
 }

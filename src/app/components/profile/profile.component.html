@@ -1,1 +1,62 @@
-<p>profile works!</p>
+<div class="user-wrapper">
+  <div class="user-info">
+    <img [src]="user.avatar" alt="Your avatar" />
+    <h2 class="user-name">
+      {{ user?.firstName || "Guest" }} {{ user?.lastName }}
+    </h2>
+    <p class="user-email">{{ user?.email || "Not logged in" }}</p>
+    <p class="user-phone">{{ user?.phone || "No phone number found" }}</p>
+  </div>
+
+  <div class="user-content">
+    <div class="section">
+      <h3>Profile Information</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" [placeholder]="user.firstName" />
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="lastName" id="lastName"  [placeholder]="user.lastName"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="text" id="phone" [placeholder]="user.phone" />
+        </div>
+        <div class="form-group">
+          <label for="extra">Address</label>
+          <input type="text" id="address" [placeholder]="user.address" />
+        </div>
+      </div>
+      <button class="button">Save</button>
+    </div>
+
+    <div class="section">
+      <h3>Change Password</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="oldpass">Old Password</label>
+          <input
+            type="password"
+            id="oldPass"
+            placeholder="Enter old password"
+          />
+        </div>
+        <div class="form-group">
+          <label for="newpass">New Password</label>
+          <input
+            type="password"
+            id="newPass"
+            placeholder="Enter new password"
+          />
+        </div>
+      </div>
+      <button class="button">
+        Update Password
+      </button>
+    </div>
+  </div>
+</div>
