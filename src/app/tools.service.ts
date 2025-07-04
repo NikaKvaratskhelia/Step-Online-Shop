@@ -152,4 +152,30 @@ export class ToolsService {
       },
     });
   }
+
+  updateUserInfo(user: any) {
+    return this.http.patch(
+      `https://api.everrest.educata.dev/auth/update`,
+      user,
+      {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      }
+    );
+  }
+
+  changePassword(info: any) {
+    return this.http.patch(
+      `https://api.everrest.educata.dev/auth/change_password`,
+      info,
+      {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      }
+    );
+  }
 }

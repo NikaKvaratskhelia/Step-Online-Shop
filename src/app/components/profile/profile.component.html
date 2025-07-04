@@ -1,6 +1,33 @@
 <div class="user-wrapper">
   <div class="user-info">
     <img [src]="user.avatar" alt="Your avatar" />
+    <button (click)="showAltPfps = true">
+      Want to change Profile? Click this!
+    </button>
+    @if(showAltPfps){
+    <div class="alt-pfps">
+      <img
+        [src]="baseUrl + firstIndex"
+        alt="Alt Image"
+        (click)="updateAvatar(baseUrl + firstIndex)"
+      />
+      <img
+        [src]="baseUrl + secondIndex"
+        alt="Alt Image"
+        (click)="updateAvatar(baseUrl + secondIndex)"
+      />
+      <img
+        [src]="baseUrl + thirdIndex"
+        alt="Alt Image"
+        (click)="updateAvatar(baseUrl + thirdIndex)"
+      />
+    </div>
+
+    <div class="button-wrapper">
+      <button (click)="updateUserInfo()">Save</button>
+      <button (click)="reGenerateAvatars()">Regenerate Avatars</button>
+    </div>
+    }
     <h2 class="user-name">
       {{ user?.firstName || "Guest" }} {{ user?.lastName }}
     </h2>
@@ -14,24 +41,29 @@
       <div class="form-row">
         <div class="form-group">
           <label for="firstName">First Name</label>
-          <input type="text" id="firstName" [placeholder]="user.firstName" />
+          <input
+            type="text"
+            id="firstName"
+            [placeholder]="user.firstName"
+            [(ngModel)]="firstName"
+          />
         </div>
         <div class="form-group">
-          <label for="lastName">Last Name</label>
-          <input type="lastName" id="lastName"  [placeholder]="user.lastName"/>
+          <label for="email">Last Name</label>
+          <input type="email" id="email" [placeholder]="user.lastName" [(ngModel)]="lastName"/>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label for="phone">Phone Number</label>
-          <input type="text" id="phone" [placeholder]="user.phone" />
+          <input type="text" id="phone" [placeholder]="user.phone" [(ngModel)]="phone"/>
         </div>
         <div class="form-group">
           <label for="extra">Address</label>
-          <input type="text" id="address" [placeholder]="user.address" />
+          <input type="text" id="address" [placeholder]="user.address" [(ngModel)]="address"/>
         </div>
       </div>
-      <button class="button">Save</button>
+      <button class="button" (click)="updateUserInfo()">Save</button>
     </div>
 
     <div class="section">
@@ -43,6 +75,7 @@
             type="password"
             id="oldPass"
             placeholder="Enter old password"
+            [(ngModel)]="oldPassword"
           />
         </div>
         <div class="form-group">
@@ -51,12 +84,13 @@
             type="password"
             id="newPass"
             placeholder="Enter new password"
+            [(ngModel)]="newPassword"
           />
         </div>
       </div>
-      <button class="button">
-        Update Password
-      </button>
+      <button class="button" (click)="prepareForPassChange()">Update Password</button>
     </div>
   </div>
 </div>
+
+<app-pop-up></app-pop-up>

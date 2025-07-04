@@ -30,7 +30,32 @@
       object-fit: cover;
       border: 2px solid white;
     }
+
+    .alt-pfps {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid white;
+        cursor: pointer;
+
+        &:hover {
+          transform: scale(1.05);
+          transition: transform 0.3s;
+        }
+      }
+    }
   }
+}
+
+.button-wrapper{
+  display: flex;
+  gap: 10px;
 }
 
 .user-content {
@@ -90,6 +115,23 @@
   cursor: pointer;
   transition: background 0.3s;
   margin-top: 10px;
+
+  &:hover {
+    background: #163075;
+  }
+}
+
+button {
+  padding: 10px 24px;
+  background: #1e3a8a;
+  color: #fff;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 10px;
+  border: 1px solid white;
 
   &:hover {
     background: #163075;
