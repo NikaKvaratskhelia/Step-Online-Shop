@@ -153,6 +153,15 @@ export class ToolsService {
     });
   }
 
+  getReviewer(id: string | null) {
+    return this.http.get(`https://api.everrest.educata.dev/auth/id/${id}`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+      },
+    });
+  }
+
   updateUserInfo(user: any) {
     return this.http.patch(
       `https://api.everrest.educata.dev/auth/update`,
@@ -170,6 +179,22 @@ export class ToolsService {
     return this.http.patch(
       `https://api.everrest.educata.dev/auth/change_password`,
       info,
+      {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      }
+    );
+  }
+
+  addReview(productId: string | null, rating: number | null) {
+    return this.http.post(
+      `https://api.everrest.educata.dev/shop/products/rate`,
+      {
+        productId: productId,
+        rate: rating,
+      },
       {
         headers: {
           Accept: 'application/json',

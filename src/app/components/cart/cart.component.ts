@@ -3,13 +3,14 @@ import { ToolsService } from '../../tools.service';
 import { HttpHeaders } from '@angular/common/http';
 import { PopUpComponent } from '../pop-up/pop-up.component';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss'],
-  imports: [PopUpComponent, RouterModule],
+  imports: [PopUpComponent, RouterModule, CommonModule],
 })
 export class CartComponent {
   public cartItems: any[] = [];
@@ -26,54 +27,66 @@ export class CartComponent {
   @ViewChild(PopUpComponent) popUp!: PopUpComponent;
 
   getCart() {
-  this.isLoading = true;
-  this.cartItems = [];
+    this.isLoading = true;
+    this.cartItems = [];
 
-  this.http.getCart().subscribe({
-    next: (res: any) => {
-      const products = res.body.products;
+    this.http.getCart().subscribe({
+      next: (res: any) => {
+        const products = res.body.products;
 
+        this.cartItems = products.map((item: any) => ({
+          ...item,
+          productDetails: null,
+        }));
 
-      this.cartItems = products.map((item: any) => ({
-        ...item,
-        productDetails: null,
-      }));
+        console.log('Cart items:', this.cartItems);
 
-      let loaded = 0;
-      if (products.length === 0) this.isLoading = false;
-      
-      products.forEach((item: any, index: number) => {
-        this.http.getProductId(item.productId).subscribe((productData: any) => {
-          this.cartItems[index].productDetails = productData;
-          loaded++;
-          if (loaded === products.length) {
-            this.isLoading = false;
-          }
+        let loaded = 0;
+        if (products.length === 0) this.isLoading = false;
+
+        products.forEach((item: any, index: number) => {
+          this.http
+            .getProductId(item.productId)
+            .subscribe((productData: any) => {
+              this.cartItems[index].productDetails = productData;
+              loaded++;
+              if (loaded === products.length) {
+                this.isLoading = false;
+              }
+            });
         });
-      });
-    },
-    error: (err) => {
-      if (err.status === 409 && err.error?.error === 'User has to create cart first') {
-        // Treat "no cart" as "empty cart"
-        this.cartItems = [];
-        this.isLoading = false;
-      } else {
-        console.error('Unexpected cart error:', err);
-        this.popUp.show('Error loading cart', 'red');
-        this.isLoading = false;
-      }
-    },
-  });
-}
+      },
+      error: (err) => {
+        if (
+          err.status === 409 &&
+          err.error?.error === 'User has to create cart first'
+        ) {
+          // Treat "no cart" as "empty cart"
+          this.cartItems = [];
+          this.isLoading = false;
+        } else {
+          console.error('Unexpected cart error:', err);
+          this.popUp.show('Error loading cart', 'red');
+          this.isLoading = false;
+        }
+      },
+    });
+  }
 
   increaseQty(item: any) {
-    const newQty = item.quantity + 1;
-    this.http
-      .addToCart({ id: item.productId, quantity: newQty }, this.headers)
-      .subscribe(() => {
-        item.quantity = newQty;
-        this.popUp.show('Quantity increased successfully!', 'green');
-      });
+    let currentQty = item.quantity;
+    if (currentQty >= item.productDetails.stock) {
+      this.popUp.show('Cannot increase quantity, stock limit reached!', 'red');
+      return;
+    } else {
+      currentQty++;
+      item.quantity = currentQty;
+      this.http
+        .addToCart({ id: item.productId, quantity: currentQty }, this.headers)
+        .subscribe(() => {
+          this.popUp.show('Quantity increased successfully!', 'green');
+        });
+    }
   }
 
   decreaseQty(item: any) {

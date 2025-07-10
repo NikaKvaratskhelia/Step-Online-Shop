@@ -3,6 +3,7 @@
   <p>Loading your cart...</p>
 </div>
 } @else if(cartItems.length > 0){
+
 <div class="cart-container">
   <h2>Your Cart</h2>
 
@@ -21,6 +22,23 @@
           <button (click)="decreaseQty(item)">−</button>
           <span>{{ item.quantity }}</span>
           <button (click)="increaseQty(item)">+</button>
+        </div>
+      </div>
+
+      <div class="cart-info details">
+        <div>
+          <h3>In Stock:</h3>
+          <p>{{ item.productDetails?.stock }}</p>
+        </div>
+
+        <div>
+          <h3>Total Reviews:</h3>
+          <p>{{ item.productDetails?.ratings.length }}</p>
+        </div>
+
+        <div>
+          <h3>Rating:</h3>
+          <p>{{ item.productDetails?.rating }}</p>
         </div>
       </div>
 

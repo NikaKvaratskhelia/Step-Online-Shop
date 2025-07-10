@@ -1,4 +1,4 @@
-import { Component, NgModule, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, NgModule, OnInit, ViewChild } from '@angular/core';
 import { ToolsService } from '../../tools.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { NgModel } from '@angular/forms';
@@ -22,6 +22,8 @@ export class DetailsComponent implements OnInit {
   public productExsistsInCart: boolean = false;
   public productInCart: any;
   public updating: boolean = false;
+
+  public operation: 'details' | 'reviews' = 'details';
 
   public headers = new HttpHeaders({
     Authorization: `Bearer ${sessionStorage.getItem('token')}`,
@@ -73,6 +75,7 @@ export class DetailsComponent implements OnInit {
     console.log('Opening product details for ID:', this.id);
     this.tools.getProductId(this.id).subscribe((data: any) => {
       this.selectedProduct = data;
+
       if (data.ratings.length > 0) {
         const total = data.ratings.reduce(
           (sum: number, r: any) => sum + r.value,
@@ -82,7 +85,10 @@ export class DetailsComponent implements OnInit {
       } else {
         this.averageRating = 0;
       }
+
+      console.log('Selected product:', this.selectedProduct);
       this.updateStarsDisplay();
+      this.loadAllReviewers();
     });
   }
 
@@ -159,5 +165,43 @@ export class DetailsComponent implements OnInit {
 
       this.updating = false;
     }, 1000);
+  }
+
+  reviewersMap: { [userId: string]: any } = {};
+
+  loadAllReviewers() {
+    this.selectedProduct.ratings.forEach((review: any) => {
+      if (!this.reviewersMap[review.userId]) {
+        this.tools.getReviewer(review.userId).subscribe((data: any) => {
+          this.reviewersMap[review.userId] = data;
+        });
+      }
+    });
+    console.log('Reviewer data:', this.reviewersMap);
+  }
+
+  selectedRating: number = 0;
+  hoveredRating: number = 0;
+
+  setHover(rating: number) {
+    this.hoveredRating = rating;
+  }
+
+  clearHover() {
+    this.hoveredRating = 0;
+  }
+  selectRating(rating: number) {
+    this.selectedRating = rating;
+    console.log('User selected rating:', rating);
+  }
+
+  rate() {
+    this.tools
+      .addReview(this.id, this.selectedRating)
+      .subscribe((data: any) => {
+          this.popUp.show('Thank you for your review!', 'green');
+          this.operation = 'reviews';
+          this.openProductDetails();
+      });
   }
 }

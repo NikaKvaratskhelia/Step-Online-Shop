@@ -7,6 +7,7 @@ import { AuthGuard } from './auth.guard';
 import { LoginGuard } from './login.guard';
 import { DetailsComponent } from './components/details/details.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
+import { ReviewerProfileComponent } from './components/reviewer-profile/reviewer-profile.component';
 
 export const routes: Routes = [
   {
@@ -33,6 +34,12 @@ export const routes: Routes = [
   {
     path: 'details/:id',
     component: DetailsComponent,
+    canActivate: [AuthGuard],
+  },
+
+  {
+    path: 'reviewer/:id',
+    component: ReviewerProfileComponent,
     canActivate: [AuthGuard],
   },
   

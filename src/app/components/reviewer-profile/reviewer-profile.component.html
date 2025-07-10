@@ -1,0 +1,42 @@
+
+
+
+@if(user){
+  <div class="user-profile">
+  <div class="card">
+    <div class="avatar-section">
+      <img [src]="user.avatar" alt="User Avatar" />
+      <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+      <p class="role">Role: <span>{{ user.role }}</span></p>
+      @if(user.verified) {
+        <span class="verified">✔ Verified</span>
+      }
+    </div>
+
+    <div class="info-section">
+      <div class="info-item">
+        <strong>Email:</strong>
+        <p>{{ user.email }}</p>
+      </div>
+      <div class="info-item">
+        <strong>Phone:</strong>
+        <p>{{ user.phone }}</p>
+      </div>
+      <div class="info-item">
+        <strong>Address:</strong>
+        <p>{{ user.address }}, {{ user.zipcode }}</p>
+      </div>
+      <div class="info-item">
+        <strong>Age:</strong>
+        <p>{{ user.age }}</p>
+      </div>
+      <div class="info-item">
+        <strong>Gender:</strong>
+        <p>{{ user.gender }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+} @else {
+  <h1>No User Found <br> Error 404</h1>
+}
