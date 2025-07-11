@@ -53,9 +53,88 @@
   }
 }
 
-.button-wrapper{
+.button-wrapper {
   display: flex;
   gap: 10px;
+}
+
+.delete-btn {
+  background-color: #dc2626;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  margin-top: auto;
+
+  &:hover {
+    background-color: #b91c1c;
+  }
+}
+
+@keyframes popUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.alert-wrapper {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  inset: 0;
+  background-color: #3333337a;
+  .alert {
+    position: absolute;
+    animation: popUp 0.3s ease-in-out;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'bpg arial caps';
+
+    h1{
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+      max-width: 250px;
+      text-align: center;
+    }
+
+    .btn-wrapper{
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      background-color: #dc2626;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #b91c1c;
+      }
+    }
+  }
 }
 
 .user-content {

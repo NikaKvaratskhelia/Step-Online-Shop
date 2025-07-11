@@ -188,6 +188,15 @@ export class ToolsService {
     );
   }
 
+  deleteAccount() {
+    return this.http.delete(`https://api.everrest.educata.dev/auth/delete`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+      },
+    });
+  }
+
   addReview(productId: string | null, rating: number | null) {
     return this.http.post(
       `https://api.everrest.educata.dev/shop/products/rate`,

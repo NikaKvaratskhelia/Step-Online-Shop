@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ToolsService } from '../../tools.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PopUpComponent } from "../pop-up/pop-up.component";
+import { PopUpComponent } from '../pop-up/pop-up.component';
 
 @Component({
   selector: 'app-profile',
@@ -24,6 +24,7 @@ export class ProfileComponent {
   public showAltPfps: boolean = false;
   public oldPassword: string | null = null;
   public newPassword: string | null = null;
+  public showAlert: boolean = false;
 
   @ViewChild(PopUpComponent) popUp!: PopUpComponent;
   constructor(private tools: ToolsService) {
@@ -55,8 +56,8 @@ export class ProfileComponent {
         gender: this.user.gender,
       })
       .subscribe((data: any) => {
-        console.log(data), sessionStorage.setItem('user', JSON.stringify(data))
-        this.popUp.show("Profile updated successfully", "green")  
+        console.log(data), sessionStorage.setItem('user', JSON.stringify(data));
+        this.popUp.show('Profile updated successfully', 'green');
         this.user = data;
       });
   }
@@ -71,22 +72,31 @@ export class ProfileComponent {
         console.log(data);
         this.oldPassword = null;
         this.newPassword = null;
-        if(data.access_token){
-          this.popUp.show("Password updated successfully", "green");
+        if (data.access_token) {
+          this.popUp.show('Password updated successfully', 'green');
           sessionStorage.setItem('token', data.access_token);
         }
-
       });
   }
 
   prepareForPassChange() {
     if (this.newPassword === null || this.oldPassword === null) {
-      this.popUp.show("Please fill in both fields", "red");
-    } else if (this.oldPassword === this.newPassword)  {
-      this.popUp.show("New password cannot be the same as old password", "red");
+      this.popUp.show('Please fill in both fields', 'red');
+    } else if (this.oldPassword === this.newPassword) {
+      this.popUp.show('New password cannot be the same as old password', 'red');
     } else {
       this.updatePassword();
     }
   }
-}
 
+  deleteAccount() {
+    this.tools.deleteAccount().subscribe((data: any) => {
+      console.log(data);
+      if (data.acknowledged) {
+        this.popUp.show('Account deleted successfully', 'green');
+        sessionStorage.clear();
+        window.location.href = '/';
+      }
+    });
+  }
+}
