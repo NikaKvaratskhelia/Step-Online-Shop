@@ -86,6 +86,7 @@ export class LogInComponent {
 
   signIn() {
     this.tools.signIn(this.signInInfo.value).subscribe((data: any) => {
+      sessionStorage.setItem('email', this.signInInfo.value.email);
       sessionStorage.setItem('token', data.access_token);
       this.tools.setLoggedIn(true);
       this.popUp.show('Welcome back!', 'green');
@@ -97,15 +98,32 @@ export class LogInComponent {
   }
 
   signUp() {
-    this.tools.signUp(this.signUpInfo.value).subscribe((data: any) => {
-      console.log(data);
-      if (data.status === 201) {
-        this.popUp.show('Registration successful! Now please verify your email!', 'green');
+    if (this.signUpInfo.invalid) {
+      this.popUp.show('Please fill out all required fields correctly.', 'red');
+      return;
+    }
+
+    const formData = this.signUpInfo.value;
+
+    this.tools.signUp(formData).subscribe({
+      next: (data: any) => {
+        this.popUp.show(
+          'Registration successful! Now please verify your email!',
+          'green'
+        );
         this.signUpInfo.reset();
         this.showLogIn();
-      } else {
-        this.popUp.show('Registration failed. Please try again.', 'red');
-      }
+      },
+      error: (err: any) => {
+        console.error('Signup error:', err);
+
+        const errorMessage =
+          err?.error?.message ||
+          err?.error?.error ||
+          'An unexpected error occurred. Please try again.';
+
+        this.popUp.show(errorMessage, 'red');
+      },
     });
   }
 

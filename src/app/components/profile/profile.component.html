@@ -34,8 +34,12 @@
     <p class="user-email">{{ user?.email || "Not logged in" }}</p>
     <p class="user-address">{{ user?.address }}</p>
     <p class="user-phone">{{ user?.phone || "No phone number found" }}</p>
+    <p>Verified: {{user?.verified}}</p>
     <button class="delete-btn" (click)="showAlert = true">
       Delete Account
+    </button>
+    <button class="verify-btn" (click)="verifyEmail()">
+      Verify Email
     </button>
   </div>
 

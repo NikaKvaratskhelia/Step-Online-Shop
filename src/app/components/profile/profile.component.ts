@@ -99,4 +99,16 @@ export class ProfileComponent {
       }
     });
   }
+
+  verifyEmail() {
+    this.tools.verifyEmail(sessionStorage.getItem('email')).subscribe((data: any) => {
+      console.log(data);
+      if (data.status === 200) {
+        this.popUp.show('Verification email sent successfully', 'green');
+      } else {
+        this.popUp.show('Failed to send verification email', 'red');
+      }
+    });
+  }
+  
 }

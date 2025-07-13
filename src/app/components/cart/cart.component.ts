@@ -66,7 +66,6 @@ export class CartComponent {
           this.isLoading = false;
         } else {
           console.error('Unexpected cart error:', err);
-          this.popUp.show('Error loading cart', 'red');
           this.isLoading = false;
         }
       },

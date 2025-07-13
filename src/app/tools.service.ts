@@ -212,4 +212,12 @@ export class ToolsService {
       }
     );
   }
+
+  verifyEmail(param: any) {
+  return this.http.post(
+    `https://api.everrest.educata.dev/auth/verify_email`,
+    { email: param }
+  );
+}
+
 }

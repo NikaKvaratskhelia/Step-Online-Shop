@@ -151,16 +151,24 @@ export class DetailsComponent implements OnInit {
               })
         : this.tools
             .addCreateToCart({ id: this.id, quantity: 1 }, this.headers)
-            .subscribe((data: any) => {
-              if (data && data.products) {
-                this.popUp.show('Product added to cart successfully!', 'green');
-                this.userHasCart = true;
-                console.log(this.id);
-              } else {
-                this.popUp.show('Failed to add product to cart.', 'red');
+            .subscribe({
+              next: (data: any) => {
+                console.log('create cart');
+                if (data && data.products) {
+                  this.popUp.show(
+                    'Product added to cart successfully!',
+                    'green'
+                  );
+                  this.userHasCart = true;
+                } else {
+                  this.popUp.show('Failed to add product to cart.', 'red');
+                }
+                this.refreshCart();
+              },
+              error: (err: any) => {  
+                console.error('Error adding product to cart:', err);
+                this.popUp.show(`${err.error.error}`, 'red');
               }
-
-              this.refreshCart();
             });
 
       this.updating = false;
