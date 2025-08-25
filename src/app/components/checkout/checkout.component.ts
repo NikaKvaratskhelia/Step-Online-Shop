@@ -22,6 +22,7 @@ export class CheckoutComponent {
     this.http.checkout(this.headers).subscribe((response: any) => {
       console.log('Checkout response:', response);
       this.popUp.show('Checkout successful!', 'green');
+      window.location.href = '/';
     });
   }
 }

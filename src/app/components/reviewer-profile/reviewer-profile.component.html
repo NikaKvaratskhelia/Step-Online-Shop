@@ -37,6 +37,10 @@
     </div>
   </div>
 </div>
-} @else {
+} @else if(!user && !loading) {
   <h1>No User Found <br> Error 404</h1>
+} @else {
+  <div class="loading-spinner" [ngClass]="{'active': loading}">
+    <div class="spinner"></div>
+  </div>
 }
