@@ -15,7 +15,9 @@
       </a>
 
       <div class="cart-info">
-        <h3>{{ item.productDetails?.title }}</h3>
+        <h3 class="product-title-responsive" [attr.title]="item.productDetails?.title">{{ item.productDetails?.brand.toUpperCase()}} {{
+          item.productDetails?.category.name.toUpperCase() }}</h3>
+        <h3 class="title">{{ item.productDetails?.title}}</h3>
         <p>{{ item.productDetails?.price.current }}$</p>
 
         <div class="cart-quantity">
@@ -29,11 +31,6 @@
         <div>
           <h3>In Stock:</h3>
           <p>{{ item.productDetails?.stock }}</p>
-        </div>
-
-        <div>
-          <h3>Total Reviews:</h3>
-          <p>{{ item.productDetails?.ratings.length }}</p>
         </div>
 
         <div>

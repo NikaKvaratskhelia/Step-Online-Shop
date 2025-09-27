@@ -288,6 +288,11 @@ main {
         overflow: hidden;
         position: relative;
 
+        img{
+          width: 100px;
+          height: 125px;
+        }
+
         .slider-track {
           display: flex;
           flex-direction: row;

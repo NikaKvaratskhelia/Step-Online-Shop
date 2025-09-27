@@ -1,31 +1,29 @@
-<form class="payment-info" (submit)="checkout($event)">
+<form class="payment-info" (submit)="checkout($event)" [formGroup]="paymentInfo">
 
   <div class="card-number">
-    <label for="cardNum"
-      >ბარათის ნომერი*</label
-    >
-    <input type="text" id="cardNum" placeholder="0123 4567 8901 1234"  required/>
+    <label for="cardNum">ბარათის ნომერი*</label><input id="cardNum" formControlName="cardNum" inputmode="numeric"
+      pattern="[0-9 ]*" (input)="formatCardNum($event)" placeholder="0123 4567 8901 1234" required maxlength="19" />
+
   </div>
 
   <div class="card-date-cvv">
     <div class="card-date input-group">
-      <label for="cardDate" 
-        >მოქმედების ვადა*</label
-      >
-      <input type="text" id="cardDate" placeholder="MM / YYYY"  required/>
+      <label for="cardDate">მოქმედების ვადა*</label><input id="cardDate" formControlName="cardDate" inputmode="numeric"
+        pattern="[0-9/ ]*" (input)="formatDate($event)" placeholder="MM / YYYY" required />
+
     </div>
 
     <div class="card-cvv input-group">
-      <label for="cardCvv">CVC / CVV</label>
-      <input type="text" id="cardCvv" placeholder="CVC / CVV"  required/>
+      <label for="cardCvv">CVC / CVV</label><input id="cardCvv" formControlName="cardCvv" inputmode="numeric"
+        pattern="\d*" maxlength="4" (input)="digitsOnly($event)" placeholder="CVC / CVV" required />
+
     </div>
   </div>
 
   <div class="card-owner input-group">
-    <label for="cardOwner"
-      >ბარათის მფლობელი*</label
-    >
-    <input type="text" id="cardOwner" placeholder="J.Smith"  required/>
+    <label for="cardOwner">ბარათის მფლობელი*</label><input id="cardOwner" formControlName="cardOwner"
+      pattern="[A-Za-z .']*" (input)="lettersOnly($event)" placeholder="J.Smith" required />
+
   </div>
 
   <button type="submit">გადახდა</button>
