@@ -26,16 +26,6 @@ $--dark-color: #1c1c1c;
   src: url(Fonts/Titillium_Web/TitilliumWeb-SemiBold.ttf);
 }
 
-@font-face {
-  font-family: georgian-regular;
-  src: url(Fonts/Noto_Sans_Georgian/static/NotoSansGeorgian-Regular.ttf);
-}
-
-@font-face {
-  font-family: georgian-bold;
-  src: url(Fonts/Noto_Sans_Georgian/static/NotoSansGeorgian-Bold.ttf);
-}
-
 %buttons {
   cursor: pointer;
   background: linear-gradient(to bottom, #8181ee, #8147e6);

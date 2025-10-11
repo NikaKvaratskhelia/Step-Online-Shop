@@ -1,0 +1,193 @@
+@import "variables";
+
+section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 100px;
+}
+
+h2 {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 2rem;
+}
+
+h1, h2, p, a {
+  font-family: "bpg arial caps";
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  max-width: 320px;
+  width: 100%;
+  border-radius: 22px;
+  background: #f9faff;
+  box-shadow: 10px 10px 20px #c8d0e7, -10px -10px 20px #ffffff;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  .favorite-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: #ffffff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.5s ease;
+
+    svg {
+      width: 25px;
+      height: 25px;
+      stroke: #e63946;
+      transition: all 0.5s ease;
+    }
+
+    &:hover {
+      background-color: #e63946;
+
+      svg {
+        stroke: #fff;
+        fill: #e63946;
+      }
+    }
+  }
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 12px 12px 25px #b1b8ca, -12px -12px 25px #ffffff;
+  }
+
+  .card-slider {
+    padding: 10px;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    overflow: hidden;
+    background-color: #fff;
+    border-radius: 14px;
+    border-bottom-left-radius: 22px;
+    border-bottom-right-radius: 22px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.05));
+      transition: transform 0.4s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .discount {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 2;
+      background: #e63946;
+      padding: 6px 20px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: white;
+      box-shadow: 0 3px 10px rgba(230, 57, 70, 0.6);
+      user-select: none;
+    }
+  }
+
+  .card-content {
+    padding: 24px 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 170px;
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #1f1f1f;
+      margin-bottom: 10px;
+      user-select: none;
+    }
+
+    p {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #505050;
+      margin-top: auto;
+      margin-bottom: 20px;
+      font-family: "bpg arial caps", sans-serif;
+    }
+
+    .card-btn {
+      background-color: #0a74da;
+      text-align: center;
+      border: none;
+      padding: 14px 0;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: white;
+      font-family: "bpg arial caps";
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(10, 116, 218, 0.6);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover,
+      &:focus {
+        background-color: #074bb5;
+        box-shadow: 0 8px 20px rgba(7, 75, 181, 0.8);
+        outline: none;
+      }
+    }
+  }
+}
+
+.loader{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  background-color: #1f1f1f40;
+
+  .spinner{
+    border: 6px solid white;
+    border-top: 6px solid #797575;
+    animation: spin 1s infinite linear;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+}
+@keyframes spin {
+  from{
+    transform: rotate(0deg);
+  }to{
+    transform: rotate(360deg);
+  }
+}

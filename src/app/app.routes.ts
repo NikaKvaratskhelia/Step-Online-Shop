@@ -8,6 +8,7 @@ import { LoginGuard } from './login.guard';
 import { DetailsComponent } from './components/details/details.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { ReviewerProfileComponent } from './components/reviewer-profile/reviewer-profile.component';
+import { FavoritesComponent } from './components/favorites/favorites.component';
 
 export const routes: Routes = [
   {
@@ -46,6 +47,12 @@ export const routes: Routes = [
   {
     path: 'checkout',
     component: CheckoutComponent,
+    canActivate: [AuthGuard],
+  },
+
+  {
+    path: 'favorites',
+    component: FavoritesComponent,
     canActivate: [AuthGuard],
   },
 ];

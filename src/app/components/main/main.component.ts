@@ -1,18 +1,19 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToolsService } from '../../tools.service';
 import { HttpHeaders } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { PopUpComponent } from '../pop-up/pop-up.component';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, PopUpComponent],
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
 })
-export class MainComponent {
+export class MainComponent implements AfterViewInit {
   public allProducts: any[] = [];
   public pageList: number[] = [];
   public categories: any[] = [];
@@ -21,12 +22,20 @@ export class MainComponent {
   public showFilter: boolean = false;
   public selectedProductId: string | null = null;
   public selectedProduct: any;
-
+  public user: any = JSON.parse(sessionStorage.getItem('user') || '{}');
   public filterForm: FormGroup;
-
+  public mockUser: any;
+  public favorites: any[] = [];
+  public loading: boolean = false;
   public headers = new HttpHeaders({
     Authorization: `Bearer ${sessionStorage.getItem('token')}`,
   });
+
+  @ViewChild(PopUpComponent) popUp!: PopUpComponent;
+
+  ngAfterViewInit(): void {
+    this.getMockUser();
+  }
 
   constructor(private tools: ToolsService, private fb: FormBuilder) {
     this.filterForm = this.fb.group({
@@ -46,13 +55,24 @@ export class MainComponent {
 
     this.loadInitialData();
 
-    this.tools.getUser().subscribe((data:any) => {console.log(data), sessionStorage.setItem('user', JSON.stringify(data))});
+    this.tools.getUser().subscribe((data: any) => {
+      console.log(data), sessionStorage.setItem('user', JSON.stringify(data));
+    });
   }
 
   loadInitialData() {
     this.getCategories();
     this.getBrands();
     this.getFilteredProducts();
+  }
+
+  getMockUser() {
+    this.tools.getMock(this.user._id).subscribe((data: any) => {
+      console.log(data);
+      this.mockUser = data;
+      this.favorites = data.favorites;
+      console.log(this.user);
+    });
   }
 
   changePage(page: number) {
@@ -76,6 +96,27 @@ export class MainComponent {
 
   selectBrand(brand: string) {
     this.filterForm.patchValue({ brand: brand, page_index: 1 });
+  }
+
+  addToFavs(id: string) {
+    if (this.favorites.includes(id)) {
+      this.popUp.show('Product is already in favorites', 'red');
+      return;
+    }
+
+    this.favorites.push(id);
+
+    this.tools.addToFavs(this.user._id, this.favorites).subscribe({
+      next: (res: any) => {
+        console.log(res);
+        console.log(this.favorites, this.user._id);
+        this.popUp.show('Product added to favorites', 'green');
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.popUp.show('Failed to add to favorites', 'red');
+      },
+    });
   }
 
   resetFilters() {
@@ -108,12 +149,14 @@ export class MainComponent {
   }
 
   getFilteredProducts() {
+    this.loading = true
     const url = this.buildUrl();
     this.tools.getFilteredProducts(url).subscribe({
       next: (res: any) => {
         this.allProducts = res.products || [];
         this.setupPagination(res.total || 0, res.limit || 6);
         this.myPageIndex = res.page || 1;
+        this.loading = false
       },
       error: (err) => {
         console.error('Filter request failed:', err);

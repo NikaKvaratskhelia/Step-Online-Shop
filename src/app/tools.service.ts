@@ -123,6 +123,39 @@ export class ToolsService {
     });
   }
 
+  signUpMock(info: any) {
+    return this.http.post(`https://68ea6a32f1eeb3f856e7322d.mockapi.io/users`, {
+      info,
+    });
+  }
+
+  getMock(id: any) {
+    return this.http.get(
+      `https://68ea6a32f1eeb3f856e7322d.mockapi.io/users/${id}`
+    );
+  }
+
+  addToFavs(id: any, info: any) {
+    return this.http.put(
+      `https://68ea6a32f1eeb3f856e7322d.mockapi.io/users/${id}`,
+      { favorites: info }
+    );
+  }
+
+  changeInfoMock(id: string, info: any) {
+    return this.http.put(
+      `https://68ea6a32f1eeb3f856e7322d.mockapi.io/users/${id}`,
+      info
+    );
+  }
+
+  changePassMock(id: string, val: any) {
+    return this.http.put(
+      `https://68ea6a32f1eeb3f856e7322d.mockapi.io/users/${id}`,
+      { password: val }
+    );
+  }
+
   signOut() {
     sessionStorage.clear();
     this.setLoggedIn(false);
@@ -214,10 +247,9 @@ export class ToolsService {
   }
 
   verifyEmail(param: any) {
-  return this.http.post(
-    `https://api.everrest.educata.dev/auth/verify_email`,
-    { email: param }
-  );
-}
-
+    return this.http.post(
+      `https://api.everrest.educata.dev/auth/verify_email`,
+      { email: param }
+    );
+  }
 }

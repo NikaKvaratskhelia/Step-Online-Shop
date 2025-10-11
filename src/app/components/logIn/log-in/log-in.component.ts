@@ -85,15 +85,18 @@ export class LogInComponent {
   }
 
   signIn() {
-    this.tools.signIn(this.signInInfo.value).subscribe((data: any) => {
-      sessionStorage.setItem('email', this.signInInfo.value.email);
-      sessionStorage.setItem('token', data.access_token);
-      this.tools.setLoggedIn(true);
-      this.popUp.show('Welcome back!', 'green');
-
-      setTimeout(() => {
-        this.router.navigate(['/home']);
-      }, 1000);
+    this.tools.signIn(this.signInInfo.value).subscribe({
+      next: (data: any) => {
+        sessionStorage.setItem('email', this.signInInfo.value.email);
+        sessionStorage.setItem('token', data.access_token);
+        this.tools.setLoggedIn(true);
+        this.popUp.show('Welcome back!', 'green');
+        this.router.navigate(['home']);
+      },
+      error: (err: any) => {
+        this.popUp.show('Invalid email or password. Please try again.', 'red');
+        console.error('Login error:', err);
+      },
     });
   }
 
@@ -107,10 +110,21 @@ export class LogInComponent {
 
     this.tools.signUp(formData).subscribe({
       next: (data: any) => {
+        console.log('Signup successful:', data);
         this.popUp.show(
           'Registration successful! Now please verify your email!',
           'green'
         );
+
+        this.tools.signUpMock({
+          id: data._id,
+          name: formData.firstName,
+          surname: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          favorites: [],
+        });
+
         this.signUpInfo.reset();
         this.showLogIn();
       },

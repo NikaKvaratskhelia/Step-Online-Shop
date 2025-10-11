@@ -1,5 +1,13 @@
 @import "variables";
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -191,9 +199,37 @@
           background: #f9faff;
           box-shadow: 10px 10px 20px #c8d0e7, -10px -10px 20px #ffffff;
           display: flex;
+          position: relative;
           flex-direction: column;
           justify-content: space-between;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+          .favorite-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ffffff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s ease;
+
+            svg {
+              width: 25px;
+              height: 25px;
+              stroke: #e63946;
+              transition: all 0.5s ease;
+            }
+
+            &:hover svg {
+              stroke: #b8323c;
+              fill: #e63946;
+            }
+          }
 
           &:hover {
             transform: translateY(-10px);
@@ -349,10 +385,12 @@
     border: 1.5px solid #d1d9e6;
     background-color: #fefefe;
     font-size: 1rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     color: #2e2e2e;
-    box-shadow: inset 3px 3px 6px rgba(200, 210, 230, 0.6), inset -3px -3px 6px #ffffff;
-    transition: border-color 0.4s ease, box-shadow 0.4s ease, background-color 0.3s ease;
+    box-shadow: inset 3px 3px 6px rgba(200, 210, 230, 0.6),
+      inset -3px -3px 6px #ffffff;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease,
+      background-color 0.3s ease;
     cursor: pointer;
 
     &::placeholder {
@@ -366,8 +404,7 @@
       border-color: #0a74da;
       background-color: #ffffff;
       outline: none;
-      box-shadow:
-        0 0 8px 3px rgba(10, 116, 218, 0.3),
+      box-shadow: 0 0 8px 3px rgba(10, 116, 218, 0.3),
         inset 2px 2px 6px rgba(10, 116, 218, 0.25);
     }
 
@@ -387,7 +424,23 @@
   }
 }
 
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  background-color: #1f1f1f40;
 
+  .spinner {
+    border: 6px solid white;
+    border-top: 6px solid #797575;
+    animation: spin 1s infinite linear;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+}
 
 /* Tablet */
 @media (max-width: 960px) {

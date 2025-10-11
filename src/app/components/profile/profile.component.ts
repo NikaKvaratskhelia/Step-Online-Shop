@@ -1,8 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ToolsService } from '../../tools.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PopUpComponent } from '../pop-up/pop-up.component';
+import { catchError, finalize, Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -10,7 +11,7 @@ import { PopUpComponent } from '../pop-up/pop-up.component';
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnDestroy {
   user: any;
   baseUrl: string = 'https://api.dicebear.com/7.x/pixel-art/svg?seed=';
   firstIndex: number = Math.floor(Math.random() * 10);
@@ -25,10 +26,16 @@ export class ProfileComponent {
   public oldPassword: string | null = null;
   public newPassword: string | null = null;
   public showAlert: boolean = false;
+  public destroy$ = new Subject();
 
   @ViewChild(PopUpComponent) popUp!: PopUpComponent;
   constructor(private tools: ToolsService) {
     this.user = JSON.parse(sessionStorage.getItem('user') || '{}');
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next;
+    this.destroy$.complete();
   }
 
   reGenerateAvatars() {
@@ -44,23 +51,49 @@ export class ProfileComponent {
   }
 
   updateUserInfo() {
-    this.tools
-      .updateUserInfo({
-        firstName: this.firstName || this.user.firstName,
-        lastName: this.lastName || this.user.lastName,
-        age: this.user.age,
-        address: this.address || this.user.address,
-        phone: this.phone || this.user.phone,
-        zipcode: this.user.zipcode,
-        avatar: this.chosenAvatar || this.user.avatar,
-        gender: this.user.gender,
-      })
-      .subscribe((data: any) => {
-        console.log(data), sessionStorage.setItem('user', JSON.stringify(data));
+  const updatedData = {
+    firstName: this.firstName || this.user.firstName,
+    lastName: this.lastName || this.user.lastName,
+    age: this.user.age,
+    address: this.address || this.user.address,
+    phone: this.phone || this.user.phone,
+    zipcode: this.user.zipcode,
+    avatar: this.chosenAvatar || this.user.avatar,
+    gender: this.user.gender,
+  };
+
+  this.tools
+    .updateUserInfo(updatedData)
+    .pipe(
+      takeUntil(this.destroy$),
+      tap((data: any) => {
+        console.log('Updated main user:', data);
+        sessionStorage.setItem('user', JSON.stringify(data));
         this.popUp.show('Profile updated successfully', 'green');
         this.user = data;
-      });
-  }
+
+        this.tools
+          .changeInfoMock(this.user._id, {
+            name: updatedData.firstName,
+            surname: updatedData.lastName,
+          })
+          .pipe(
+            tap(() => console.log('Mock user updated')),
+            catchError(() => {
+              console.warn('Mock update failed');
+              return [];
+            })
+          )
+          .subscribe();
+      }),
+      catchError(() => {
+        this.popUp.show('Failed to update profile', 'red');
+        return [];
+      })
+    )
+    .subscribe();
+}
+
 
   updatePassword() {
     this.tools
@@ -68,15 +101,32 @@ export class ProfileComponent {
         oldPassword: this.oldPassword,
         newPassword: this.newPassword,
       })
-      .subscribe((data: any) => {
-        console.log(data);
-        this.oldPassword = null;
-        this.newPassword = null;
-        if (data.access_token) {
-          this.popUp.show('Password updated successfully', 'green');
-          sessionStorage.setItem('token', data.access_token);
-        }
-      });
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data: any) => {
+          this.oldPassword = null;
+
+          if (data.access_token) {
+            this.popUp.show('Password updated successfully', 'green');
+            sessionStorage.setItem('token', data.access_token);
+
+            this.tools
+              .changePassMock(this.user._id, this.newPassword)
+              .subscribe({
+                next: () => console.log('Mock password updated'),
+                error: (e) => console.error('Mock update failed:', e),
+              });
+
+            this.newPassword = null;
+          }
+        }),
+        catchError((err: any) => {
+          console.error(err);
+          this.popUp.show(err.error?.error || 'Password update failed', 'red');
+          return [];
+        })
+      )
+      .subscribe();
   }
 
   prepareForPassChange() {
@@ -101,14 +151,15 @@ export class ProfileComponent {
   }
 
   verifyEmail() {
-    this.tools.verifyEmail(sessionStorage.getItem('email')).subscribe((data: any) => {
-      console.log(data);
-      if (data.status === 200) {
-        this.popUp.show('Verification email sent successfully', 'green');
-      } else {
-        this.popUp.show('Failed to send verification email', 'red');
-      }
-    });
+    this.tools
+      .verifyEmail(sessionStorage.getItem('email'))
+      .subscribe((data: any) => {
+        console.log(data);
+        if (data.status === 200) {
+          this.popUp.show('Verification email sent successfully', 'green');
+        } else {
+          this.popUp.show('Failed to send verification email', 'red');
+        }
+      });
   }
-  
 }
