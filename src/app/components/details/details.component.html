@@ -21,7 +21,7 @@
       ><img src="assets/Images/arrow.png" alt="" /> Back</a
     >
     <div class="image-section">
-      <div class="slider-btn" (click)="prev()">&#10094;</div>
+      <div class="slider-btn" (click)="prev(selectedProduct.images)">&#10094;</div>
       <img [src]="selectedProduct.images[index]" alt="Product image" />
       <div class="slider-btn" (click)="next(selectedProduct.images)">
         &#10095;

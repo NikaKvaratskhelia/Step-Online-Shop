@@ -1,0 +1,21 @@
+<section>
+    <div class="detail-names">
+        <p>Name:</p>
+        <p>Current Price:</p>
+        <p>Original Price:</p>
+        <p>Rating:</p>
+        <p>Warranty:</p>
+        <p>Remove:</p>
+    </div>
+
+    @for(product of comparing; track $index){
+    <div class="detail-names">
+        <a [routerLink]="['/details', product._id]">{{product.title | shortenTitle}}</a>
+        <p>{{product.price.current}}$</p>
+        <p>{{product.price.beforeDiscount}}$</p>
+        <p>{{product.rating}}</p>
+        <p>{{product.warranty}} Years</p>
+        <button (click)="remove(product)">Remove</button>
+    </div>
+    }
+</section>

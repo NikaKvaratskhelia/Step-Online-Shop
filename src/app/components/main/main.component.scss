@@ -225,9 +225,13 @@
               transition: all 0.5s ease;
             }
 
-            &:hover svg {
-              stroke: #b8323c;
-              fill: #e63946;
+            &:hover {
+              background-color: #e63946;
+
+              svg {
+                stroke: #fff;
+                fill: #e63946;
+              }
             }
           }
 
@@ -283,6 +287,34 @@
             flex-direction: column;
             justify-content: space-between;
             min-height: 170px;
+
+            .compare {
+              display: flex;
+              padding: 5px;
+              gap: 10px;
+              cursor: pointer;
+              user-select: none;
+              transition: all 0.5s;
+              border-radius: 10px;
+              max-width: fit-content;
+              margin-bottom: 10px;
+
+              p {
+                margin: 0px;
+              }
+
+              &:hover {
+                background-color: #0d80ff;
+
+                svg {
+                  stroke: #fff;
+                }
+
+                p {
+                  color: #fff;
+                }
+              }
+            }
 
             .card-title {
               font-size: 1.3rem;

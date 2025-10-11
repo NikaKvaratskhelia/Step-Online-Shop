@@ -27,6 +27,7 @@ export class MainComponent implements AfterViewInit {
   public mockUser: any;
   public favorites: any[] = [];
   public loading: boolean = false;
+  public comparing: any[] = [];
   public headers = new HttpHeaders({
     Authorization: `Bearer ${sessionStorage.getItem('token')}`,
   });
@@ -149,14 +150,14 @@ export class MainComponent implements AfterViewInit {
   }
 
   getFilteredProducts() {
-    this.loading = true
+    this.loading = true;
     const url = this.buildUrl();
     this.tools.getFilteredProducts(url).subscribe({
       next: (res: any) => {
         this.allProducts = res.products || [];
         this.setupPagination(res.total || 0, res.limit || 6);
         this.myPageIndex = res.page || 1;
-        this.loading = false
+        this.loading = false;
       },
       error: (err) => {
         console.error('Filter request failed:', err);
@@ -167,5 +168,11 @@ export class MainComponent implements AfterViewInit {
   setupPagination(total: number, limit: number) {
     const pageNum = Math.ceil(total / limit);
     this.pageList = Array.from({ length: pageNum }, (_, i) => i + 1);
+  }
+
+  addToCompare(product: any) {
+    this.comparing.push(product);
+
+    sessionStorage.setItem( "comparingProducts", JSON.stringify(this.comparing))
   }
 }

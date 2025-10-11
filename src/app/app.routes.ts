@@ -9,6 +9,7 @@ import { DetailsComponent } from './components/details/details.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { ReviewerProfileComponent } from './components/reviewer-profile/reviewer-profile.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
+import { CompareComponent } from './components/compare/compare.component';
 
 export const routes: Routes = [
   {
@@ -43,7 +44,7 @@ export const routes: Routes = [
     component: ReviewerProfileComponent,
     canActivate: [AuthGuard],
   },
-  
+
   {
     path: 'checkout',
     component: CheckoutComponent,
@@ -53,6 +54,12 @@ export const routes: Routes = [
   {
     path: 'favorites',
     component: FavoritesComponent,
+    canActivate: [AuthGuard],
+  },
+  
+  {
+    path: 'compare',
+    component: CompareComponent,
     canActivate: [AuthGuard],
   },
 ];

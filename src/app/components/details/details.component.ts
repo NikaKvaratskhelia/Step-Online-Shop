@@ -56,16 +56,17 @@ export class DetailsComponent implements OnInit {
     this.openProductDetails();
   }
 
-  prev() {
+  prev(list: any) {
     if (this.index !== 0) {
       this.index--;
+    } else {
+      this.index = list.length - 1;
     }
   }
 
   next(list: any) {
-    console.log(this.userHasCart);
     if (this.index === list.length - 1) {
-      return;
+      this.index = 0;
     } else {
       this.index++;
     }
@@ -165,10 +166,10 @@ export class DetailsComponent implements OnInit {
                 }
                 this.refreshCart();
               },
-              error: (err: any) => {  
+              error: (err: any) => {
                 console.error('Error adding product to cart:', err);
                 this.popUp.show(`${err.error.error}`, 'red');
-              }
+              },
             });
 
       this.updating = false;
@@ -207,9 +208,9 @@ export class DetailsComponent implements OnInit {
     this.tools
       .addReview(this.id, this.selectedRating)
       .subscribe((data: any) => {
-          this.popUp.show('Thank you for your review!', 'green');
-          this.operation = 'reviews';
-          this.openProductDetails();
+        this.popUp.show('Thank you for your review!', 'green');
+        this.operation = 'reviews';
+        this.openProductDetails();
       });
   }
 }
