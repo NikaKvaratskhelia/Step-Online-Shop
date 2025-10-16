@@ -258,11 +258,6 @@
               object-position: center;
               display: block;
               filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.05));
-              transition: transform 0.4s ease;
-
-              &:hover {
-                transform: scale(1.05);
-              }
             }
 
             .discount {
@@ -405,10 +400,33 @@
 .filter-form {
   display: flex;
   flex-wrap: wrap;
+  max-width: 1400px;
+  width: 90%;
+  margin: 0 auto;
   gap: 1.25rem;
   margin-bottom: 2.5rem;
   justify-content: center;
 
+  .card-btn {
+    background-color: #0a74da;
+    text-align: center;
+    border: none;
+    padding: 14px 5px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(10, 116, 218, 0.6);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover,
+    &:focus {
+      background-color: #074bb5;
+      box-shadow: 0 8px 20px rgba(7, 75, 181, 0.8);
+      outline: none;
+    }
+  }
   input,
   select {
     min-width: 180px;
@@ -474,7 +492,16 @@
   }
 }
 
-/* Tablet */
+.empty-h1 {
+  text-align: center;
+  color: #505050;
+}
+
+.empty-img {
+  max-width: 700px;
+  width: 100%;
+}
+
 @media (max-width: 960px) {
   .filter-products {
     flex-direction: column;
@@ -500,7 +527,6 @@
   }
 }
 
-/* Mobile */
 @media (max-width: 600px) {
   .card-content {
     padding: 16px;
@@ -520,7 +546,6 @@
   }
 }
 
-/* Very small screens */
 @media (max-width: 420px) {
   .card {
     max-width: 100%;

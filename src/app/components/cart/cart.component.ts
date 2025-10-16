@@ -61,7 +61,6 @@ export class CartComponent {
           err.status === 409 &&
           err.error?.error === 'User has to create cart first'
         ) {
-          // Treat "no cart" as "empty cart"
           this.cartItems = [];
           this.isLoading = false;
         } else {
@@ -70,6 +69,11 @@ export class CartComponent {
         }
       },
     });
+  }
+
+  savePrice() {
+    sessionStorage.setItem('totalPrice', `${this.getTotalPrice()}`);
+    window.location.href = '/checkout';
   }
 
   increaseQty(item: any) {

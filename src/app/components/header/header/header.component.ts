@@ -14,6 +14,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public isLoggedIn: boolean = false;
   public menuIsOpen: boolean = false;
   private loginSub!: Subscription;
+  public roleSub!: Subscription;
+  public role: string = '';
 
   constructor(private router: Router, private tools: ToolsService) {}
 
@@ -21,6 +23,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.loginSub = this.tools.isLoggedIn$.subscribe((status) => {
       this.isLoggedIn = status;
     });
+
+    this.roleSub = this.tools.role$.subscribe((status) => {
+      this.role = status;
+    });
+
+    console.log(this.roleSub, this.role, this.loginSub, this.isLoggedIn)
   }
 
   ngOnDestroy() {

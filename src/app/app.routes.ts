@@ -10,6 +10,7 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
 import { ReviewerProfileComponent } from './components/reviewer-profile/reviewer-profile.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
 import { CompareComponent } from './components/compare/compare.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 export const routes: Routes = [
   {
@@ -60,6 +61,12 @@ export const routes: Routes = [
   {
     path: 'compare',
     component: CompareComponent,
+    canActivate: [AuthGuard],
+  },
+
+  {
+    path: 'admin',
+    component: AdminComponent,
     canActivate: [AuthGuard],
   },
 ];

@@ -15,7 +15,8 @@
       </a>
 
       <div class="cart-info">
-        <h3 class="product-title-responsive" [attr.title]="item.productDetails?.title">{{ item.productDetails?.brand.toUpperCase()}} {{
+        <h3 class="product-title-responsive" [attr.title]="item.productDetails?.title">{{
+          item.productDetails?.brand.toUpperCase()}} {{
           item.productDetails?.category.name.toUpperCase() }}</h3>
         <h3 class="title">{{ item.productDetails?.title}}</h3>
         <p>{{ item.productDetails?.price.current }}$</p>
@@ -48,8 +49,8 @@
     <p>
       Subtotal: <strong>{{ getTotalPrice() }}$</strong>
     </p>
-    <a class="checkout-btn" [routerLink]="['/checkout']">
-      Proceed to Checkout
+    <a class="checkout-btn" (click)="savePrice()">
+    Proceed to Checkout
     </a>
   </div>
 </div>
@@ -57,6 +58,7 @@
 <div class="empty-cart">
   <h2>Your cart is empty 🛒</h2>
   <p>Add something nice!</p>
+  <img src="assets/Images/emptyCart.webp" alt="">
 </div>
 }
 

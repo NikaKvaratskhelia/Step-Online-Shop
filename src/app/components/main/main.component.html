@@ -1,4 +1,4 @@
-<form [formGroup]="filterForm" class="filter-form">
+<form [formGroup]="filterForm" class="filter-form" [ngStyle]="{display: loading ? 'none' : 'flex'}">
   <input formControlName="keywords" placeholder="Search keywords" />
   <input formControlName="rating" placeholder="Rating" type="number" />
   <input formControlName="price_min" placeholder="Min Price" type="number" />
@@ -15,6 +15,8 @@
     <option value="asc">Asc</option>
     <option value="desc">Desc</option>
   </select>
+
+  <button class="card-btn" (click)="getFilteredProducts()">Submit</button>
 </form>
 
 <div class="container" [ngStyle]="{display: loading ? 'none' : 'flex'}">
@@ -91,8 +93,8 @@
           </div>
         </div>
         } @empty {
-        <h1>No Items Match Your Filter</h1>
-        <img src="assets/Images/emptyCart.webp" alt="Empty cart">
+        <h1 class="empty-h1">No Items Match Your Filter</h1>
+        <img class="empty-img" src="assets/Images/emptyCart.webp" alt="Empty cart">
         }
       </section>
     </div>

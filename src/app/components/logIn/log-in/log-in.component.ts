@@ -85,17 +85,30 @@ export class LogInComponent {
   }
 
   signIn() {
-    this.tools.signIn(this.signInInfo.value).subscribe({
+    const { email, password } = this.signInInfo.value;
+
+    if (email === 'admin@gmail.com' && password === 'admin123') {
+      sessionStorage.setItem('role', 'admin');
+      sessionStorage.setItem('token', 'admin');
+      this.tools.setLoggedIn(true);
+      this.tools.setRole('admin');
+      this.popUp.show('Welcome back, Admin!', 'green');
+      this.router.navigate(['/home']);
+      return;
+    }
+
+    this.tools.signIn({ email, password }).subscribe({
       next: (data: any) => {
-        sessionStorage.setItem('email', this.signInInfo.value.email);
+        sessionStorage.setItem('email', email);
         sessionStorage.setItem('token', data.access_token);
+        sessionStorage.setItem('role', 'user');
         this.tools.setLoggedIn(true);
+        this.tools.setRole('user');
         this.popUp.show('Welcome back!', 'green');
-        this.router.navigate(['home']);
+        this.router.navigate(['/home']);
       },
-      error: (err: any) => {
-        this.popUp.show('Invalid email or password. Please try again.', 'red');
-        console.error('Login error:', err);
+      error: () => {
+        this.popUp.show('Invalid email or password.', 'red');
       },
     });
   }

@@ -22,9 +22,10 @@ export class DetailsComponent implements OnInit {
   public productExsistsInCart: boolean = false;
   public productInCart: any;
   public updating: boolean = false;
-
+  public loading: boolean = false;
   public operation: 'details' | 'reviews' = 'details';
-
+  public role: string = sessionStorage.getItem('role')!;
+  public oldAdminArr: string[] = [];
   public headers = new HttpHeaders({
     Authorization: `Bearer ${sessionStorage.getItem('token')}`,
   });
@@ -52,8 +53,32 @@ export class DetailsComponent implements OnInit {
     });
   }
 
+  sendToAdmin() {
+    if (this.role === 'admin') return;
+
+    this.tools.getAdminArrs().subscribe({
+      next: (data: any) => {
+        let viewedProducts;
+        if (data.viewedProducts.length > 50) {
+          viewedProducts = data.viewedProducts.slice(-50) || [];
+        } else {
+          viewedProducts = data.viewedProducts || [];
+        }
+
+        viewedProducts.push(this.selectedProduct._id);
+
+        this.tools.sendToAdmin('viewedProducts', viewedProducts).subscribe({
+          next: () => console.log('Sent to admin well'),
+          error: (err) => console.error('Failed to send to admin', err),
+        });
+      },
+      error: (err) => console.error('Failed to get admin array', err),
+    });
+  }
+
   ngOnInit(): void {
     this.openProductDetails();
+    this.sendToAdmin();
   }
 
   prev(list: any) {
@@ -73,9 +98,11 @@ export class DetailsComponent implements OnInit {
   }
 
   openProductDetails() {
+    this.loading = true;
     console.log('Opening product details for ID:', this.id);
     this.tools.getProductId(this.id).subscribe((data: any) => {
       this.selectedProduct = data;
+      this.loading = false;
 
       if (data.ratings.length > 0) {
         const total = data.ratings.reduce(

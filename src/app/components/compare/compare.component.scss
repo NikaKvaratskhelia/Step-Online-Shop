@@ -1,86 +1,116 @@
-section {
+.compare-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 1300px;
-  width: 90%;
-  margin: auto;
-  margin-bottom: 30px;
+  width: 95%;
+  max-width: 1200px;
+  margin: 40px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'bpg arial caps';
+  min-height: 500px;
 
-  .detail-names {
+  .compare-header {
+    justify-self:flex-start;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 30px;
-    border: 1px solid black;
-    border-radius: 5px;
-    padding: 20px;
+    background: #111;
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    padding: 15px 10px;
+    font-size: 1.05rem;
+  }
 
-    p,
-    a {
-      font-family: "bpg arial caps";
-      font-size: 1rem;
-      font-weight: 500;
-      color: black;
+  .compare-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    align-items: center;
+    padding: 18px 10px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.25s ease;
+    text-align: center;
+
+    &:hover {
+      background: #fafafa;
     }
 
-    a {
+    .product-title {
+      color: #0078d7;
+      font-weight: 600;
+      text-decoration: none;
       position: relative;
-      &::before {
-        content: "View Details";
-        position: absolute;
-        top: -30px;
-        border-radius: 3px;
-        padding: 4px;
-        right: 0px;
-        display: none;
-        background-color: black;
-        color: #fff;
+
+      &::after {
+        content: "🔗";
         opacity: 0;
-        transition: all 0.3s;
+        position: absolute;
+        right: -18px;
+        transition: opacity 0.2s ease;
       }
 
       &:hover {
-        &::before {
-          display: block;
+        text-decoration: underline;
+        &::after {
           opacity: 1;
         }
       }
     }
 
-    &:first-child p {
+    .product-price {
+      color: #2c7a2c;
+      font-weight: 700;
+    }
+
+    .product-old-price {
+      text-decoration: line-through;
+      color: #999;
+    }
+
+    .product-rating {
+      font-size: 1rem;
+      color: #ffb400;
+    }
+
+    .product-warranty {
+      color: #444;
+    }
+
+    .remove-btn {
+      background: transparent;
+      border: 1px solid #d00;
+      color: #d00;
+      border-radius: 6px;
+      padding: 6px 10px;
       font-weight: 600;
-      font-size: 20px;
-      font-family: "bpg arial caps";
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        background: #d00;
+        color: #fff;
+      }
     }
   }
 
-  button {
-    outline: none;
-    border: none;
-    background-color: transparent;
-    border: 1px solid black;
-    border-radius: 5px;
-    padding: 5px;
-    font-size: 16px;
-    transition: all 0.3s;
-    cursor: pointer;
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.347);
-      color: white;
-    }
+  .compare-row:last-child {
+    border-bottom: none;
   }
 }
 
-@media screen and (max-width: 550px) {
-  section {
-    flex-direction: row;
-    overflow-x: scroll;
+@media (max-width: 750px) {
+  .compare-container {
+    .compare-header {
+      display: none;
+    }
 
-    .detail-names {
+    .compare-row {
       grid-template-columns: 1fr;
-      grid-template-rows: repeat(6, 1fr);
-      min-width: 150px;
-      align-content: space-between;
+      gap: 6px;
+      text-align: left;
+      padding: 15px 20px;
+      border: 1px solid #eee;
     }
   }
 }

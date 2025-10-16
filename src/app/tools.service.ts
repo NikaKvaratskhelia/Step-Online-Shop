@@ -168,13 +168,33 @@ export class ToolsService {
     );
   }
 
+  sendToAdmin(key: string, val: string[]) {
+    return this.http.put(`https://68ea6a32f1eeb3f856e7322d.mockapi.io/admin/1`, {
+      [key]: val,
+    });
+  }
+
+  getAdminArrs() {
+    return this.http.get(`https://68ea6a32f1eeb3f856e7322d.mockapi.io/admin/1`);
+  }
+
   private isLoggedInSubject = new BehaviorSubject<boolean>(
     !!sessionStorage.getItem('token')
   );
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
+  private roleSubject = new BehaviorSubject<string>(
+    sessionStorage.getItem('role')!
+  );
+
+  public role$ = this.roleSubject.asObservable();
+
   setLoggedIn(value: boolean) {
     this.isLoggedInSubject.next(value);
+  }
+
+  setRole(value: string) {
+    this.roleSubject.next(value);
   }
 
   getUser() {

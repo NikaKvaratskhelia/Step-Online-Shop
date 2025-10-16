@@ -1,25 +1,17 @@
-<div class="wrapper">
+<div class="wrapper" [ngStyle]="{display: loading ? 'none' : 'flex'}">
   <div class="cart-headers">
-    <h2
-      [ngClass]="{ active: operation === 'details' }"
-      (click)="operation = 'details'"
-    >
+    <h2 [ngClass]="{ active: operation === 'details' }" (click)="operation = 'details'">
       Details
     </h2>
     <h1>|</h1>
-    <h2
-      [ngClass]="{ active: operation === 'reviews' }"
-      (click)="operation = 'reviews'"
-    >
+    <h2 [ngClass]="{ active: operation === 'reviews' }" (click)="operation = 'reviews'">
       Reviews
     </h2>
   </div>
 
   @if(operation === 'details') {
   <div class="product-detail">
-    <a class="back-btn" routerLink="/home"
-      ><img src="assets/Images/arrow.png" alt="" /> Back</a
-    >
+    <a class="back-btn" routerLink="/home"><img src="assets/Images/arrow.png" alt="" /> Back</a>
     <div class="image-section">
       <div class="slider-btn" (click)="prev(selectedProduct.images)">&#10094;</div>
       <img [src]="selectedProduct.images[index]" alt="Product image" />
@@ -35,17 +27,15 @@
       <div class="price-box">
         <span class="price">{{
           selectedProduct.price.current
-            | currency : selectedProduct.price.currency
-        }}</span>
+          | currency : selectedProduct.price.currency
+          }}</span>
 
         @if(selectedProduct.price.discountPercentage !== 0){
         <span class="before">{{
           selectedProduct.price.beforeDiscount
-            | currency : selectedProduct.price.currency
-        }}</span>
-        <span class="discount"
-          >-{{ selectedProduct.price.discountPercentage }}%</span
-        >
+          | currency : selectedProduct.price.currency
+          }}</span>
+        <span class="discount">-{{ selectedProduct.price.discountPercentage }}%</span>
         }
       </div>
 
@@ -53,14 +43,10 @@
       <div class="stars">
         @for(star of starsDisplay; track $index){
         <ng-container>
-          <span
-            class="star"
-            [ngClass]="{
+          <span class="star" [ngClass]="{
               filled: star === 'full',
               half: star === 'half'
-            }"
-            >&#9733;</span
-          >
+            }">&#9733;</span>
         </ng-container>
         }
         <span class="average-number">({{ averageRating.toFixed(1) }})</span>
@@ -80,9 +66,9 @@
           <strong>Stock:</strong>
           <p>
             {{
-              selectedProduct.stock >= 0
-                ? selectedProduct.stock
-                : "Out of stock"
+            selectedProduct.stock >= 0
+            ? selectedProduct.stock
+            : "Out of stock"
             }}
           </p>
         </div>
@@ -96,20 +82,13 @@
         </div>
       </div>
 
-      <button
-        class="add-to-cart-btn"
-        [disabled]="selectedProduct.stock <= 0 || updating"
-        (click)="addToCart()"
-      >
-        {{ selectedProduct.stock <= 0 ? "Out of Stock" : "Add to Cart" }}
-      </button>
+      <button class="add-to-cart-btn" [disabled]="selectedProduct.stock <= 0 || updating || role === 'admin'" (click)="addToCart()">
+        {{ selectedProduct.stock <= 0 ? "Out of Stock" : "Add to Cart" }} </button>
     </div>
   </div>
   }@else {
   <div class="reviews">
-    <a class="back-btn" routerLink="/home"
-      ><img src="assets/Images/arrow.png" alt="" /> Back</a
-    >
+    <a class="back-btn" routerLink="/home"><img src="assets/Images/arrow.png" alt="" /> Back</a>
     @if(selectedProduct.ratings.length > 0){
     <div class="review-list">
       <h2>Reviews ({{ selectedProduct.ratings.length }})</h2>
@@ -121,12 +100,9 @@
 
         <div class="review-item">
           <a [routerLink]="['/reviewer', review.userId]" class="reviewer-info">
-            <img
-              [src]="
+            <img [src]="
                 reviewersMap[review.userId]?.avatar || 'assets/Images/OIP.webp'
-              "
-              alt="Reviewer avatar"
-            />
+              " alt="Reviewer avatar" />
 
             <span class="review-author">
               {{ reviewersMap[review.userId]?.firstName || "Guest" }}
@@ -140,7 +116,7 @@
           <div class="review-header">
             <span class="review-date">{{
               review.createdAt | date : "shortDate"
-            }}</span>
+              }}</span>
           </div>
         </div>
         }
@@ -149,19 +125,14 @@
       <div class="star-input">
         <div class="stars-wrapper">
           <ng-container *ngFor="let star of [1, 2, 3, 4, 5]">
-            <span
-              class="star"
-              [class.filled]="star <= (hoveredRating || selectedRating)"
-              (click)="selectRating(star)"
-              (mouseenter)="setHover(star)"
-              (mouseleave)="clearHover()"
-            >
+            <span class="star" [class.filled]="star <= (hoveredRating || selectedRating)" (click)="selectRating(star)"
+              (mouseenter)="setHover(star)" (mouseleave)="clearHover()">
               &#9733;
             </span>
           </ng-container>
           <span class="rating-label">{{ selectedRating }}/5</span>
         </div>
-        <button (click)="rate()">Submit</button>
+        <button (click)="rate()" [disabled]="role === 'admin'">Submit</button>
       </div>
     </div>
     }@else {
@@ -170,5 +141,10 @@
   </div>
   }
 </div>
+
+<div class="loader" [ngStyle]="{display: loading ? 'flex' : 'none'}">
+  <div class="spinner"></div>
+</div>
+
 
 <app-pop-up></app-pop-up>

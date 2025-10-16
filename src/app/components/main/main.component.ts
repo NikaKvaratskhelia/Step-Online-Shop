@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToolsService } from '../../tools.service';
 import { HttpHeaders } from '@angular/common/http';
@@ -52,8 +58,6 @@ export class MainComponent implements AfterViewInit {
       sort_direction: ['desc'],
     });
 
-    this.filterForm.valueChanges.subscribe(() => this.getFilteredProducts());
-
     this.loadInitialData();
 
     this.tools.getUser().subscribe((data: any) => {
@@ -79,6 +83,7 @@ export class MainComponent implements AfterViewInit {
   changePage(page: number) {
     this.myPageIndex = page;
     this.filterForm.patchValue({ page_index: page });
+    this.getFilteredProducts();
   }
 
   getCategories() {
@@ -93,10 +98,12 @@ export class MainComponent implements AfterViewInit {
 
   selectCategory(categoryID: number | null) {
     this.filterForm.patchValue({ category_id: categoryID, page_index: 1 });
+    this.getFilteredProducts();
   }
 
   selectBrand(brand: string) {
     this.filterForm.patchValue({ brand: brand, page_index: 1 });
+    this.getFilteredProducts();
   }
 
   addToFavs(id: string) {
@@ -132,6 +139,8 @@ export class MainComponent implements AfterViewInit {
       sort_direction: 'desc',
       page_index: 1,
     });
+
+    this.getFilteredProducts();
   }
 
   buildUrl(): string {
@@ -171,8 +180,12 @@ export class MainComponent implements AfterViewInit {
   }
 
   addToCompare(product: any) {
-    this.comparing.push(product);
+    if (this.comparing.includes(product)) {
+      return this.popUp.show('Product is already chosen', 'red');
+    }
 
-    sessionStorage.setItem( "comparingProducts", JSON.stringify(this.comparing))
+    this.comparing.push(product);
+    sessionStorage.setItem('comparingProducts', JSON.stringify(this.comparing));
+    this.popUp.show('Product added to comparing list', 'green');
   }
 }

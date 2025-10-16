@@ -1,0 +1,96 @@
+<section class="admin-dashboard">
+    <h2 class="title">Most Viewed Products</h2>
+    @if(loading){
+    <div class="loading">Loading analytics...</div>
+    }
+
+    @if(!loading){
+    <div class="grid">
+        @for(product of mostVieweds; track $index) {
+        <div class="product-card">
+            <div class="thumb">
+                <img [src]="product.thumbnail" [alt]="product.title" />
+            </div>
+
+            <div class="info">
+                <h3 class="name">{{ product.title }}</h3>
+                <p class="brand">{{ product.brand | uppercase }}</p>
+                <p class="price">
+                    {{ product.price.current | currency: product.price.currency }}
+                    <span class="discount">-{{ product.price.discountPercentage }}%</span>
+                </p>
+
+                <p class="rating">
+                    ⭐ {{ product.rating }}/5 ({{ product.ratings.length }} ratings)
+                </p>
+
+                <div class="meta">
+                    <span class="category">Category: {{ product.category.name || 'N/A' }}</span>
+                    <span class="stock" [ngClass]="{ 'out': product.stock <= 0 }">
+                        {{ product.stock > 0 ? product.stock + ' in stock' : 'Out of stock' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        }@empty {
+        <p>
+            No Viewed Products yet.
+        </p>
+        }
+    </div>}
+
+    <h2 class="title">Analytics</h2>
+
+    <div class="choosecatg">
+        <p [ngClass]="{'active':wantedAnalytics==='week'}" (click)="wantedAnalytics='week'">
+            Last 7 Days
+        </p>
+        <span>
+            |
+        </span>
+        <p [ngClass]="{'active':wantedAnalytics==='month'}" (click)="wantedAnalytics='month'"> Last Month</p>
+    </div>
+
+    <div class="dashboard">
+        <h1>Sales Analytics (Past @if(wantedAnalytics === 'week'){
+            7
+            }@else{
+            30
+            } Days)</h1>
+        <div class="cards">
+            <div class="card">
+                <h2>Total Sales</h2>
+                @if(wantedAnalytics === 'week'){
+                <p>{{lastWeekTotal}}$</p>
+                }@else{
+                <p>{{lastMonthTotal}}$</p>
+                }
+            </div>
+            <div class="card">
+                <h2>Revenue Growth</h2>
+                @if(wantedAnalytics === 'week'){
+                {{weeklyRevenue}}%
+                }@else{
+                    {{monthlyRevenue}}%
+                }
+            </div>
+        </div>
+
+        <div class="chart">
+            <h2>Daily Sales</h2>
+            <div class="bars">
+
+                @if(wantedAnalytics === 'week'){
+                @for(sale of lastWeek; track $index){
+                <div class="bar" [style.width.%]="(sale.total / maxPrice) * 100 + 1"><span>{{sale.total}}$</span></div>
+                }
+                }@else{
+                @for(sale of lastMonth; track $index){
+                <div class="bar" [style.width.%]="(sale.total / maxPrice) * 100 + 1"><span>{{sale.total}}$</span></div>
+                }
+                }
+            </div>
+        </div>
+    </div>
+
+</section>

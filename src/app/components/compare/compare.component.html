@@ -1,21 +1,23 @@
-<section>
-    <div class="detail-names">
-        <p>Name:</p>
-        <p>Current Price:</p>
-        <p>Original Price:</p>
-        <p>Rating:</p>
-        <p>Warranty:</p>
-        <p>Remove:</p>
-    </div>
+<section class="compare-container">
+  <div class="compare-header">
+    <div class="header-item">Name</div>
+    <div class="header-item">Current Price</div>
+    <div class="header-item">Original Price</div>
+    <div class="header-item">Rating</div>
+    <div class="header-item">Warranty</div>
+    <div class="header-item">Remove</div>
+  </div>
 
-    @for(product of comparing; track $index){
-    <div class="detail-names">
-        <a [routerLink]="['/details', product._id]">{{product.title | shortenTitle}}</a>
-        <p>{{product.price.current}}$</p>
-        <p>{{product.price.beforeDiscount}}$</p>
-        <p>{{product.rating}}</p>
-        <p>{{product.warranty}} Years</p>
-        <button (click)="remove(product)">Remove</button>
-    </div>
-    }
+  @for (product of comparing; track $index) {
+  <div class="compare-row">
+    <a [routerLink]="['/details', product._id]" class="product-title">
+      {{ product.title | shortenTitle }}
+    </a>
+    <div class="product-price">{{ product.price.current }}$</div>
+    <div class="product-old-price">{{ product.price.beforeDiscount }}$</div>
+    <div class="product-rating">⭐ {{ product.rating }}</div>
+    <div class="product-warranty">{{ product.warranty }} Years</div>
+    <button class="remove-btn" (click)="remove(product)">Remove</button>
+  </div>
+  }
 </section>
