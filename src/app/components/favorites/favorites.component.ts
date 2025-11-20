@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ToolsService } from '../../tools.service';
+import { ToolsService } from '../../Services/tools.service';
 import { catchError, finalize, of, Subject, takeUntil, tap } from 'rxjs';
 import { PopUpComponent } from '../pop-up/pop-up.component';
 

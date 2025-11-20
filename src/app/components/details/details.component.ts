@@ -1,5 +1,5 @@
 import { Component, Input, NgModule, OnInit, ViewChild } from '@angular/core';
-import { ToolsService } from '../../tools.service';
+import { ToolsService } from '../../Services/tools.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { NgModel } from '@angular/forms';
 import { CommonModule } from '@angular/common';

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { ToolsService } from '../../tools.service';
+import { ToolsService } from '../../Services/tools.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PopUpComponent } from '../pop-up/pop-up.component';

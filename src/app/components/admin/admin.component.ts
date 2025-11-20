@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ToolsService } from '../../tools.service';
+import { ToolsService } from '../../Services/tools.service';
 import {
   catchError,
   finalize,

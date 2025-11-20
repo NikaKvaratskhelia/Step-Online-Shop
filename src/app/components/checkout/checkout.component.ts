@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ToolsService } from '../../tools.service';
 import { PopUpComponent } from '../pop-up/pop-up.component';
 import { HttpHeaders } from '@angular/common/http';
 import {
@@ -10,6 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { catchError, finalize, Subject, takeUntil, tap } from 'rxjs';
+import { ToolsService } from '../../Services/tools.service';
 
 @Component({
   selector: 'app-checkout',

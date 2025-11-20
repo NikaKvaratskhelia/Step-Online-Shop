@@ -6,7 +6,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ToolsService } from '../../tools.service';
+import { ToolsService } from '../../Services/tools.service';
 import { HttpHeaders } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';

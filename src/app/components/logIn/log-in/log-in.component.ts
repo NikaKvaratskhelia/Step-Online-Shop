@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, NgModule, ViewChild } from '@angular/core';
-import { ToolsService } from '../../../tools.service';
+import { ToolsService } from '../../../Services/tools.service';
 import {
   FormControl,
   FormGroup,

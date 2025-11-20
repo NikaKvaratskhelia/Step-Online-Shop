@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ShortenTitlePipe } from "../../shorten-title.pipe";
 import { RouterModule } from '@angular/router';
+import { ShortenTitlePipe } from '../../Pipes/shorten-title.pipe';
 
 @Component({
   selector: 'app-compare',
