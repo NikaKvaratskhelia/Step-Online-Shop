@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { ToolsService } from '../../../tools.service';
+import { ToolsService } from '../../../Services/tools.service';
 import { Subscription } from 'rxjs';
 
 @Component({

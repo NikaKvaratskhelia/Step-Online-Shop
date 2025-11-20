@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule, ViewChild } from '@angular/core';
+import { Component, NgModule, OnDestroy, ViewChild } from '@angular/core';
 import { ToolsService } from '../../../Services/tools.service';
 import {
   FormControl,
@@ -9,6 +9,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PopUpComponent } from '../../pop-up/pop-up.component';
+import { catchError, finalize, takeUntil, tap, Subject, take } from 'rxjs';
 
 @Component({
   selector: 'app-log-in',
@@ -16,8 +17,9 @@ import { PopUpComponent } from '../../pop-up/pop-up.component';
   templateUrl: './log-in.component.html',
   styleUrl: './log-in.component.scss',
 })
-export class LogInComponent {
+export class LogInComponent implements OnDestroy {
   public logInActive: boolean = false;
+  private destroyed$ = new Subject();
   public operation: string = 'login';
   public sentPassword: boolean = false;
   public sentRecovery: boolean = false;
@@ -25,6 +27,11 @@ export class LogInComponent {
   public countdownInterval: any;
 
   constructor(private tools: ToolsService, private router: Router) {}
+
+  ngOnDestroy(): void {
+    this.destroyed$.next;
+    this.destroyed$.complete();
+  }
 
   @ViewChild(PopUpComponent) popUp!: PopUpComponent;
 
@@ -97,20 +104,28 @@ export class LogInComponent {
       return;
     }
 
-    this.tools.signIn({ email, password }).subscribe({
-      next: (data: any) => {
-        sessionStorage.setItem('email', email);
-        sessionStorage.setItem('token', data.access_token);
-        sessionStorage.setItem('role', 'user');
-        this.tools.setLoggedIn(true);
-        this.tools.setRole('user');
-        this.popUp.show('Welcome back!', 'green');
-        this.router.navigate(['/home']);
-      },
-      error: () => {
-        this.popUp.show('Invalid email or password.', 'red');
-      },
-    });
+    this.tools
+      .signIn({ email, password })
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          sessionStorage.setItem('email', email);
+          sessionStorage.setItem('token', data.access_token);
+          sessionStorage.setItem('role', 'user');
+          this.tools.setLoggedIn(true);
+          this.tools.setRole('user');
+          this.popUp.show('Welcome back!', 'green');
+          this.router.navigate(['/home']);
+        }),
+        catchError((err) => {
+          this.popUp.show('Invalid email or password.', 'red');
+          return err;
+        }),
+        finalize(() => {
+          console.log('Done');
+        })
+      )
+      .subscribe();
   }
 
   signUp() {
@@ -121,54 +136,72 @@ export class LogInComponent {
 
     const formData = this.signUpInfo.value;
 
-    this.tools.signUp(formData).subscribe({
-      next: (data: any) => {
-        console.log('Signup successful:', data);
-        this.popUp.show(
-          'Registration successful! Now please verify your email!',
-          'green'
-        );
+    this.tools
+      .signUp(formData)
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          console.log('Signup successful:', data);
+          this.popUp.show(
+            'Registration successful! Now please verify your email!',
+            'green'
+          );
 
-        this.tools.signUpMock({
-          id: data._id,
-          name: formData.firstName,
-          surname: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          favorites: [],
-        });
+          this.tools.signUpMock({
+            id: data._id,
+            name: formData.firstName,
+            surname: formData.lastName,
+            email: formData.email,
+            password: formData.password,
+            favorites: [],
+          });
 
-        this.signUpInfo.reset();
-        this.showLogIn();
-      },
-      error: (err: any) => {
-        console.error('Signup error:', err);
+          this.signUpInfo.reset();
+          this.showLogIn();
+        }),
+        catchError((err: any) => {
+          console.error('Signup error:', err);
 
-        const errorMessage =
-          err?.error?.message ||
-          err?.error?.error ||
-          'An unexpected error occurred. Please try again.';
+          const errorMessage =
+            err?.error?.message ||
+            err?.error?.error ||
+            'An unexpected error occurred. Please try again.';
 
-        this.popUp.show(errorMessage, 'red');
-      },
-    });
+          this.popUp.show(errorMessage, 'red');
+          return err;
+        }),
+        finalize(() => {
+          console.log('Done');
+        })
+      )
+      .subscribe();
   }
 
   recoverPassword() {
-    this.tools.recoverPassword(this.recovery.value).subscribe((data: any) => {
-      console.log(data);
-      if (data.status === 200) {
-        this.sentRecovery = true;
-        this.countdown = 60;
+    this.tools
+      .recoverPassword(this.recovery.value)
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          console.log(data);
+          if (data.status === 200) {
+            this.sentRecovery = true;
+            this.countdown = 60;
 
-        this.countdownInterval = setInterval(() => {
-          this.countdown--;
-          if (this.countdown === 0) {
-            clearInterval(this.countdownInterval);
-            this.sentRecovery = false;
+            this.countdownInterval = setInterval(() => {
+              this.countdown--;
+              if (this.countdown === 0) {
+                clearInterval(this.countdownInterval);
+                this.sentRecovery = false;
+              }
+            }, 1000);
           }
-        }, 1000);
-      }
-    });
+        }),
+        catchError((err) => {
+          console.log(err);
+          return err;
+        })
+      )
+      .subscribe();
   }
 }

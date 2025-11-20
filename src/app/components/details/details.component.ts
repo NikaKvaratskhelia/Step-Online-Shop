@@ -1,10 +1,17 @@
-import { Component, Input, NgModule, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  Input,
+  NgModule,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ToolsService } from '../../Services/tools.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { NgModel } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { PopUpComponent } from '../pop-up/pop-up.component';
+import { takeUntil, tap, Subject, catchError, finalize, take } from 'rxjs';
 
 @Component({
   selector: 'app-details',
@@ -12,7 +19,7 @@ import { PopUpComponent } from '../pop-up/pop-up.component';
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
 })
-export class DetailsComponent implements OnInit {
+export class DetailsComponent implements OnInit, OnDestroy {
   id: string | null = '';
   public selectedProduct: any;
   public index: number = 0;
@@ -30,50 +37,82 @@ export class DetailsComponent implements OnInit {
     Authorization: `Bearer ${sessionStorage.getItem('token')}`,
   });
 
+  private destroyed$ = new Subject();
+
   @ViewChild(PopUpComponent) popUp!: PopUpComponent;
 
   constructor(private tools: ToolsService, private route: ActivatedRoute) {
     this.id = this.route.snapshot.paramMap.get('id');
     this.refreshCart();
   }
+  ngOnDestroy(): void {
+    this.destroyed$.next;
+    this.destroyed$.complete();
+  }
 
   refreshCart() {
-    this.tools.getCart().subscribe((data: any) => {
-      data.status === 200
-        ? (this.userHasCart = true)
-        : (this.userHasCart = false);
+    this.tools
+      .getCart()
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          data.status === 200
+            ? (this.userHasCart = true)
+            : (this.userHasCart = false);
 
-      data.body.products.forEach((product: any) => {
-        if (product.productId === this.id) {
-          this.productExsistsInCart = true;
-          this.productInCart = product;
-          console.log('Product exists in cart:', this.productInCart);
-        }
-      });
-    });
+          data.body.products.forEach((product: any) => {
+            if (product.productId === this.id) {
+              this.productExsistsInCart = true;
+              this.productInCart = product;
+              console.log('Product exists in cart:', this.productInCart);
+            }
+          });
+        }),
+        catchError((err) => {
+          console.error(err);
+          return err;
+        })
+      )
+      .subscribe();
   }
 
   sendToAdmin() {
     if (this.role === 'admin') return;
 
-    this.tools.getAdminArrs().subscribe({
-      next: (data: any) => {
-        let viewedProducts;
-        if (data.viewedProducts.length > 50) {
-          viewedProducts = data.viewedProducts.slice(-50) || [];
-        } else {
-          viewedProducts = data.viewedProducts || [];
-        }
+    this.tools
+      .getAdminArrs()
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          let viewedProducts;
+          if (data.viewedProducts.length > 50) {
+            viewedProducts = data.viewedProducts.slice(-50) || [];
+          } else {
+            viewedProducts = data.viewedProducts || [];
+          }
 
-        viewedProducts.push(this.selectedProduct._id);
+          viewedProducts.push(this.selectedProduct._id);
 
-        this.tools.sendToAdmin('viewedProducts', viewedProducts).subscribe({
-          next: () => console.log('Sent to admin well'),
-          error: (err) => console.error('Failed to send to admin', err),
-        });
-      },
-      error: (err) => console.error('Failed to get admin array', err),
-    });
+          this.tools
+            .sendToAdmin('viewedProducts', viewedProducts)
+            .pipe(
+              takeUntil(this.destroyed$),
+              tap(() => {
+                console.log('Sent to admin well');
+              }),
+              catchError((err) => {
+                console.error('Failed to get admin array', err);
+                return err;
+              })
+            )
+            .subscribe();
+        }),
+        catchError((err) => {
+          console.error('Failed to get admin array', err);
+          return err;
+        })
+      )
+      .subscribe();
   }
 
   ngOnInit(): void {
@@ -100,24 +139,36 @@ export class DetailsComponent implements OnInit {
   openProductDetails() {
     this.loading = true;
     console.log('Opening product details for ID:', this.id);
-    this.tools.getProductId(this.id).subscribe((data: any) => {
-      this.selectedProduct = data;
-      this.loading = false;
+    this.tools
+      .getProductId(this.id)
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          this.selectedProduct = data;
+          this.loading = false;
 
-      if (data.ratings.length > 0) {
-        const total = data.ratings.reduce(
-          (sum: number, r: any) => sum + r.value,
-          0
-        );
-        this.averageRating = total / data.ratings.length;
-      } else {
-        this.averageRating = 0;
-      }
+          if (data.ratings.length > 0) {
+            const total = data.ratings.reduce(
+              (sum: number, r: any) => sum + r.value,
+              0
+            );
+            this.averageRating = total / data.ratings.length;
+          } else {
+            this.averageRating = 0;
+          }
 
-      console.log('Selected product:', this.selectedProduct);
-      this.updateStarsDisplay();
-      this.loadAllReviewers();
-    });
+          console.log('Selected product:', this.selectedProduct);
+          this.updateStarsDisplay();
+          this.loadAllReviewers();
+        }),
+        catchError((err) => {
+          return err;
+        }),
+        finalize(() => {
+          console.log('fetched');
+        })
+      )
+      .subscribe();
   }
 
   updateStarsDisplay() {
@@ -143,64 +194,70 @@ export class DetailsComponent implements OnInit {
     if (this.userHasCart) {
       this.refreshCart();
     }
-    setTimeout(() => {
-      this.userHasCart
-        ? this.productExsistsInCart
-          ? this.tools
-              .addToCart(
-                { id: this.id, quantity: this.productInCart.quantity + 1 },
-                this.headers
-              )
-              .subscribe((data: any) => {
-                console.log('quantity');
-                if (data && data.products) {
-                  this.popUp.show(
-                    'Product added to cart successfully!',
-                    'green'
-                  );
-                } else {
-                  this.popUp.show('Failed to add product to cart.', 'red');
-                }
-                this.refreshCart();
-              })
-          : this.tools
-              .addToCart({ id: this.id, quantity: 1 }, this.headers)
-              .subscribe((data: any) => {
-                console.log('new product');
-                if (data && data.products) {
-                  this.popUp.show(
-                    'Product added to cart successfully!',
-                    'green'
-                  );
-                } else {
-                  this.popUp.show('Failed to add product to cart.', 'red');
-                }
-                this.refreshCart();
-              })
-        : this.tools
-            .addCreateToCart({ id: this.id, quantity: 1 }, this.headers)
-            .subscribe({
-              next: (data: any) => {
-                console.log('create cart');
-                if (data && data.products) {
-                  this.popUp.show(
-                    'Product added to cart successfully!',
-                    'green'
-                  );
-                  this.userHasCart = true;
-                } else {
-                  this.popUp.show('Failed to add product to cart.', 'red');
-                }
-                this.refreshCart();
-              },
-              error: (err: any) => {
-                console.error('Error adding product to cart:', err);
-                this.popUp.show(`${err.error.error}`, 'red');
-              },
-            });
 
-      this.updating = false;
-    }, 1000);
+    if (!this.userHasCart) {
+      this.tools
+        .addCreateToCart({ id: this.id, quantity: 1 }, this.headers)
+        .pipe(
+          takeUntil(this.destroyed$),
+          tap((data: any) => {
+            console.log('create cart');
+            if (data && data.products) {
+              this.popUp.show('Product added to cart successfully!', 'green');
+              this.userHasCart = true;
+            } else {
+              this.popUp.show('Failed to add product to cart.', 'red');
+            }
+            this.refreshCart();
+          }),
+          catchError((err) => {
+            console.error('Error adding product to cart:', err);
+            this.popUp.show(`${err.error.error}`, 'red');
+            return err;
+          })
+        )
+        .subscribe();
+    }
+
+    if (this.productExsistsInCart) {
+      this.tools
+        .addToCart(
+          { id: this.id, quantity: this.productInCart.quantity + 1 },
+          this.headers
+        )
+        .pipe(
+          takeUntil(this.destroyed$),
+          tap((data: any) => {
+            console.log('quantity');
+            if (data && data.products) {
+              this.popUp.show('Product added to cart successfully!', 'green');
+            } else {
+              this.popUp.show('Failed to add product to cart.', 'red');
+            }
+            this.refreshCart();
+          })
+        )
+        .subscribe();
+    } else {
+      this.tools
+        .addToCart({ id: this.id, quantity: 1 }, this.headers)
+        .pipe(
+          takeUntil(this.destroyed$),
+          tap(() => {
+            this.popUp.show('Product added to cart successfully!', 'green');
+
+            this.refreshCart();
+          }),
+          catchError((err) => {
+            console.error('Error adding product to cart:', err);
+            this.popUp.show(`${err.error.error}`, 'red');
+            return err;
+          })
+        )
+        .subscribe();
+    }
+
+    this.updating = false;
   }
 
   reviewersMap: { [userId: string]: any } = {};
@@ -208,9 +265,22 @@ export class DetailsComponent implements OnInit {
   loadAllReviewers() {
     this.selectedProduct.ratings.forEach((review: any) => {
       if (!this.reviewersMap[review.userId]) {
-        this.tools.getReviewer(review.userId).subscribe((data: any) => {
-          this.reviewersMap[review.userId] = data;
-        });
+        this.tools
+          .getReviewer(review.userId)
+          .pipe(
+            takeUntil(this.destroyed$),
+            tap((data: any) => {
+              this.reviewersMap[review.userId] = data;
+            }),
+            catchError((err) => {
+              console.log(err);
+              return err;
+            }),
+            finalize(() => {
+              console.log('done');
+            })
+          )
+          .subscribe();
       }
     });
     console.log('Reviewer data:', this.reviewersMap);
@@ -234,10 +304,21 @@ export class DetailsComponent implements OnInit {
   rate() {
     this.tools
       .addReview(this.id, this.selectedRating)
-      .subscribe((data: any) => {
-        this.popUp.show('Thank you for your review!', 'green');
-        this.operation = 'reviews';
-        this.openProductDetails();
-      });
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          this.popUp.show('Thank you for your review!', 'green');
+          this.operation = 'reviews';
+          this.openProductDetails();
+        }),
+        catchError((err) => {
+          console.log(err);
+          return [];
+        }),
+        finalize(() => {
+          console.log('Done');
+        })
+      )
+      .subscribe();
   }
 }

@@ -3,7 +3,7 @@ import { ToolsService } from '../../Services/tools.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PopUpComponent } from '../pop-up/pop-up.component';
-import { catchError, finalize, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, finalize, Subject, take, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -51,49 +51,48 @@ export class ProfileComponent implements OnDestroy {
   }
 
   updateUserInfo() {
-  const updatedData = {
-    firstName: this.firstName || this.user.firstName,
-    lastName: this.lastName || this.user.lastName,
-    age: this.user.age,
-    address: this.address || this.user.address,
-    phone: this.phone || this.user.phone,
-    zipcode: this.user.zipcode,
-    avatar: this.chosenAvatar || this.user.avatar,
-    gender: this.user.gender,
-  };
+    const updatedData = {
+      firstName: this.firstName || this.user.firstName,
+      lastName: this.lastName || this.user.lastName,
+      age: this.user.age,
+      address: this.address || this.user.address,
+      phone: this.phone || this.user.phone,
+      zipcode: this.user.zipcode,
+      avatar: this.chosenAvatar || this.user.avatar,
+      gender: this.user.gender,
+    };
 
-  this.tools
-    .updateUserInfo(updatedData)
-    .pipe(
-      takeUntil(this.destroy$),
-      tap((data: any) => {
-        console.log('Updated main user:', data);
-        sessionStorage.setItem('user', JSON.stringify(data));
-        this.popUp.show('Profile updated successfully', 'green');
-        this.user = data;
+    this.tools
+      .updateUserInfo(updatedData)
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data: any) => {
+          console.log('Updated main user:', data);
+          sessionStorage.setItem('user', JSON.stringify(data));
+          this.popUp.show('Profile updated successfully', 'green');
+          this.user = data;
 
-        this.tools
-          .changeInfoMock(this.user._id, {
-            name: updatedData.firstName,
-            surname: updatedData.lastName,
-          })
-          .pipe(
-            tap(() => console.log('Mock user updated')),
-            catchError(() => {
-              console.warn('Mock update failed');
-              return [];
+          this.tools
+            .changeInfoMock(this.user._id, {
+              name: updatedData.firstName,
+              surname: updatedData.lastName,
             })
-          )
-          .subscribe();
-      }),
-      catchError(() => {
-        this.popUp.show('Failed to update profile', 'red');
-        return [];
-      })
-    )
-    .subscribe();
-}
-
+            .pipe(
+              tap(() => console.log('Mock user updated')),
+              catchError(() => {
+                console.warn('Mock update failed');
+                return [];
+              })
+            )
+            .subscribe();
+        }),
+        catchError(() => {
+          this.popUp.show('Failed to update profile', 'red');
+          return [];
+        })
+      )
+      .subscribe();
+  }
 
   updatePassword() {
     this.tools
@@ -112,10 +111,17 @@ export class ProfileComponent implements OnDestroy {
 
             this.tools
               .changePassMock(this.user._id, this.newPassword)
-              .subscribe({
-                next: () => console.log('Mock password updated'),
-                error: (e) => console.error('Mock update failed:', e),
-              });
+              .pipe(
+                takeUntil(this.destroy$),
+                tap(() => {
+                  console.log('Mock password updated');
+                }),
+                catchError((err) => {
+                  console.error('Mock update failed:', err);
+                  return err;
+                })
+              )
+              .subscribe();
 
             this.newPassword = null;
           }
@@ -140,26 +146,38 @@ export class ProfileComponent implements OnDestroy {
   }
 
   deleteAccount() {
-    this.tools.deleteAccount().subscribe((data: any) => {
-      console.log(data);
-      if (data.acknowledged) {
-        this.popUp.show('Account deleted successfully', 'green');
-        sessionStorage.clear();
-        window.location.href = '/';
-      }
-    });
+    this.tools
+      .deleteAccount()
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data: any) => {
+          console.log(data);
+          this.popUp.show('Account deleted successfully', 'green');
+          sessionStorage.clear();
+          window.location.href = '/';
+        }),
+        catchError((err) => {
+          this.popUp.show('Account could not be deleted', 'red');
+          return err;
+        })
+      )
+      .subscribe();
   }
 
   verifyEmail() {
     this.tools
       .verifyEmail(sessionStorage.getItem('email'))
-      .subscribe((data: any) => {
-        console.log(data);
-        if (data.status === 200) {
-          this.popUp.show('Verification email sent successfully', 'green');
-        } else {
-          this.popUp.show('Failed to send verification email', 'red');
-        }
-      });
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data: any) => {
+          console.log(data);
+          if (data.status === 200) {
+            this.popUp.show('Verification email sent successfully', 'green');
+          } else {
+            this.popUp.show('Failed to send verification email', 'red');
+          }
+        })
+      )
+      .subscribe();
   }
 }

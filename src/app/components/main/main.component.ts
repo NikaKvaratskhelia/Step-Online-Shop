@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -11,6 +12,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { PopUpComponent } from '../pop-up/pop-up.component';
+import { takeUntil, tap, catchError, finalize, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-main',
@@ -19,7 +21,7 @@ import { PopUpComponent } from '../pop-up/pop-up.component';
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
 })
-export class MainComponent implements AfterViewInit {
+export class MainComponent implements AfterViewInit, OnDestroy {
   public allProducts: any[] = [];
   public pageList: number[] = [];
   public categories: any[] = [];
@@ -37,6 +39,8 @@ export class MainComponent implements AfterViewInit {
   public headers = new HttpHeaders({
     Authorization: `Bearer ${sessionStorage.getItem('token')}`,
   });
+
+  public destroyed$ = new Subject();
 
   @ViewChild(PopUpComponent) popUp!: PopUpComponent;
 
@@ -60,9 +64,24 @@ export class MainComponent implements AfterViewInit {
 
     this.loadInitialData();
 
-    this.tools.getUser().subscribe((data: any) => {
-      console.log(data), sessionStorage.setItem('user', JSON.stringify(data));
-    });
+    this.tools
+      .getUser()
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          console.log(data),
+            sessionStorage.setItem('user', JSON.stringify(data));
+        }),
+        catchError((err) => {
+          console.log(err);
+          return err;
+        })
+      )
+      .subscribe();
+  }
+  ngOnDestroy(): void {
+    this.destroyed$.next;
+    this.destroyed$.complete();
   }
 
   loadInitialData() {
@@ -72,12 +91,22 @@ export class MainComponent implements AfterViewInit {
   }
 
   getMockUser() {
-    this.tools.getMock(this.user._id).subscribe((data: any) => {
-      console.log(data);
-      this.mockUser = data;
-      this.favorites = data.favorites;
-      console.log(this.user);
-    });
+    this.tools
+      .getMock(this.user._id)
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => {
+          console.log(data);
+          this.mockUser = data;
+          this.favorites = data.favorites;
+          console.log(this.user);
+        }),
+        catchError((err) => {
+          console.log(err);
+          return err;
+        })
+      )
+      .subscribe();
   }
 
   changePage(page: number) {
@@ -89,11 +118,29 @@ export class MainComponent implements AfterViewInit {
   getCategories() {
     this.tools
       .getCategories()
-      .subscribe((data: any) => (this.categories = data));
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => (this.categories = data)),
+        catchError((err) => {
+          console.log(err);
+          return err;
+        })
+      )
+      .subscribe();
   }
 
   getBrands() {
-    this.tools.getBrands().subscribe((data: any) => (this.brands = data));
+    this.tools
+      .getBrands()
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((data: any) => (this.brands = data)),
+        catchError((err) => {
+          console.log(err);
+          return err;
+        })
+      )
+      .subscribe();
   }
 
   selectCategory(categoryID: number | null) {
@@ -114,17 +161,22 @@ export class MainComponent implements AfterViewInit {
 
     this.favorites.push(id);
 
-    this.tools.addToFavs(this.user._id, this.favorites).subscribe({
-      next: (res: any) => {
-        console.log(res);
-        console.log(this.favorites, this.user._id);
-        this.popUp.show('Product added to favorites', 'green');
-      },
-      error: (err: any) => {
-        console.error(err);
-        this.popUp.show('Failed to add to favorites', 'red');
-      },
-    });
+    this.tools
+      .addToFavs(this.user._id, this.favorites)
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((res: any) => {
+          console.log(res);
+          console.log(this.favorites, this.user._id);
+          this.popUp.show('Product added to favorites', 'green');
+        }),
+        catchError((err: any) => {
+          console.error(err);
+          this.popUp.show('Failed to add to favorites', 'red');
+          return err;
+        })
+      )
+      .subscribe();
   }
 
   resetFilters() {
@@ -161,17 +213,23 @@ export class MainComponent implements AfterViewInit {
   getFilteredProducts() {
     this.loading = true;
     const url = this.buildUrl();
-    this.tools.getFilteredProducts(url).subscribe({
-      next: (res: any) => {
-        this.allProducts = res.products || [];
-        this.setupPagination(res.total || 0, res.limit || 6);
-        this.myPageIndex = res.page || 1;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Filter request failed:', err);
-      },
-    });
+    this.tools
+      .getFilteredProducts(url)
+      .pipe(
+        takeUntil(this.destroyed$),
+        tap((res: any) => {
+          this.allProducts = res.products || [];
+          this.setupPagination(res.total || 0, res.limit || 6);
+          this.myPageIndex = res.page || 1;
+          this.loading = false;
+        }),
+        catchError((err: any) => {
+          console.error(err);
+          console.error('Filter request failed:', err);
+          return err;
+        })
+      )
+      .subscribe();
   }
 
   setupPagination(total: number, limit: number) {

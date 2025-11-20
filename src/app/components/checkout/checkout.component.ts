@@ -21,7 +21,7 @@ export class CheckoutComponent implements OnDestroy, OnInit {
   @ViewChild(PopUpComponent) popUp!: PopUpComponent;
   constructor(private http: ToolsService) {}
   ngOnInit(): void {
-    this.loadDataAdmin()
+    this.loadDataAdmin();
   }
 
   ngOnDestroy(): void {
@@ -77,17 +77,25 @@ export class CheckoutComponent implements OnDestroy, OnInit {
       timestamp: new Date().toISOString(),
     });
 
-    this.http.sendToAdmin('sales', this.sales).subscribe({
-      next: (data: any) => {
-        console.log('Updated sales:', this.sales);
-        this.popUp.show('Sale recorded successfully!', 'green');
-        window.location.href = '/';
-      },
-      error: (err) => {
-        console.error('Failed to update sales:', err);
-        this.popUp.show('Failed to record sale', 'red');
-      },
-    });
+    this.http
+      .sendToAdmin('sales', this.sales)
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((data: any) => {
+          console.log('Updated sales:', this.sales);
+          this.popUp.show('Sale recorded successfully!', 'green');
+          window.location.href = '/';
+        }),
+        catchError((err) => {
+          console.error('Failed to update sales:', err);
+          this.popUp.show('Failed to record sale', 'red');
+          return err;
+        }),
+        finalize(() => {
+          console.log(this.sales);
+        })
+      )
+      .subscribe();
   }
 
   formatCardNum(event: Event) {

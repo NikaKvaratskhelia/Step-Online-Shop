@@ -56,9 +56,21 @@ export class AdminComponent implements OnDestroy {
           this.adminInfo = data;
           this.fetchSales();
 
-          this.getMostVieweds().subscribe((data) => {
-            this.mostVieweds = data;
-          });
+          this.getMostVieweds()
+            .pipe(
+              takeUntil(this.destroyed$),
+              tap((data) => {
+                this.mostVieweds = data;
+              }),
+              catchError((err: any) => {
+                console.log(err);
+                return [];
+              }),
+              finalize(() => {
+                console.log('Done');
+              })
+            )
+            .subscribe();
         }),
         catchError((err) => {
           console.error(err);
